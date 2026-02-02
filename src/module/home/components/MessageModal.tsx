@@ -20,21 +20,21 @@ export const MessageModal: React.FC<MessageModalProps> = ({
 }) => {
   const [additionalMessage, setAdditionalMessage] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [shareNumber, setShareNumber] = useState(false);
+  const [reason, setReason] = useState(selectedReason);
   const s = messageModalStyles;
+
+  // Update local reason state when selectedReason prop changes
+  React.useEffect(() => {
+    setReason(selectedReason);
+  }, [selectedReason]);
 
   if (!isOpen) return null;
 
-  const selectedReasonLabel =
-    reasonOptions.find((r) => r.id === selectedReason)?.label ||
-    "No reason selected";
-
   const handleSend = () => {
-    onSend(additionalMessage, shareNumber ? phoneNumber : "");
+    onSend(additionalMessage, phoneNumber);
     // Reset form
     setAdditionalMessage("");
     setPhoneNumber("");
-    setShareNumber(false);
   };
 
   return (
@@ -70,10 +70,18 @@ export const MessageModal: React.FC<MessageModalProps> = ({
         <div className={s.content}>
           {/* Selected Reason */}
           <div>
-            <label className={s.label}>Selected Reason</label>
-            <div className={s.reasonBox}>
-              <p className={s.reasonText}>{selectedReasonLabel}</p>
-            </div>
+            <label className={s.label}>Select Reason</label>
+            <select
+              value={reason || ""}
+              onChange={(e) => setReason(e.target.value)}
+              className={s.input}
+            >
+              {reasonOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.icon} {option.label}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Additional Message */}
@@ -83,35 +91,21 @@ export const MessageModal: React.FC<MessageModalProps> = ({
               value={additionalMessage}
               onChange={(e) => setAdditionalMessage(e.target.value)}
               placeholder="Add any additional details..."
-              rows={4}
+              rows={3}
               className={s.textarea}
             />
           </div>
 
           {/* Share Your Number */}
           <div>
-            <div className={s.checkboxContainer}>
-              <input
-                type="checkbox"
-                id="shareNumber"
-                checked={shareNumber}
-                onChange={(e) => setShareNumber(e.target.checked)}
-                className={s.checkbox}
-              />
-              <label htmlFor="shareNumber" className={s.checkboxLabel}>
-                Share my contact number
-              </label>
-            </div>
-
-            {shareNumber && (
-              <input
-                type="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="Enter your phone number"
-                className={s.input}
-              />
-            )}
+            <label className={s.label}>Your Contact Number (Optional)</label>
+            <input
+              type="tel"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              placeholder="Enter your phone number"
+              className={s.input}
+            />
           </div>
         </div>
 
@@ -121,7 +115,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({
             Cancel
           </button>
           <button onClick={handleSend} className={s.sendButton}>
-            <span>Send via WhatsApp</span>
+            <span>Send Message</span>
             <svg
               className={s.whatsappIcon}
               fill="currentColor"
