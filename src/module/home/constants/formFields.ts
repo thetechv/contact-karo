@@ -56,6 +56,6 @@ export const ownerFormFields: FormFieldConfig[] = [
     type: "textarea",
     required: true,
     placeholder: "Enter your full address",
-    rows: 3,
+    rows: 2,
   },
 ];
