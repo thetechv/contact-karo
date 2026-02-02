@@ -23,14 +23,15 @@ import { pageStyles } from "@/fe/module/home/styles/pageStyles";
 export default function HomePage() {
   const params = useParams();
   const idParam = params?.id;
-  const id =
-    Array.isArray(idParam) ? idParam[0] ?? "" : (idParam as string | undefined) ?? "";
+  const id = Array.isArray(idParam)
+    ? idParam[0] ?? ""
+    : (idParam as string | undefined) ?? "";
 
   const [selectedReason, setSelectedReason] = useState<string | null>(
-    "no-parking",
+    "no-parking"
   );
   const [isOwnerLoginModalOpen, setIsOwnerLoginModalOpen] = useState(false);
-  const vehicleOwner = useVehicleOwner(id);
+  const { isLoading, vehicleOwner } = useVehicleOwner(id);
 
   const {
     isModalOpen,
@@ -55,58 +56,49 @@ export default function HomePage() {
     setIsOwnerLoginModalOpen(false);
   };
 
-
-  if (!vehicleOwner) {
-    return <EmptyState />;
-  }
-
   return (
     <div className={pageStyles.container}>
-      <header className={pageStyles.header}>
-        <div className={pageStyles.headerContent}>
-          <div className={pageStyles.logo}>
-            <h1 className={pageStyles.title}>Contact</h1>
-            <span className={pageStyles.badge}>Karo</span>
-          </div>
-          <ThemeToggle />
-        </div>
-      </header>
+      {vehicleOwner && !isLoading && (
+        <>
+          <main className={pageStyles.main}>
+            <VehicleInfo
+              vehicleName={vehicleOwner?.name}
+              plateNumber={vehicleOwner.vehicle_no}
+              vehicleType={vehicleOwner.vehicle_type}
+            />
 
-      <main className={pageStyles.main}>
-        <VehicleInfo
-          vehicleName={vehicleOwner.name}
-          plateNumber={vehicleOwner.vehicle_no}
-          vehicleType={vehicleOwner.vehicle_type}
-        />
+            <ReasonSelector
+              options={reasonOptions}
+              selectedReason={selectedReason}
+              onSelect={setSelectedReason}
+            />
 
-        <ReasonSelector
-          options={reasonOptions}
-          selectedReason={selectedReason}
-          onSelect={setSelectedReason}
-        />
+            <ActionButtons
+              onMessage={handleMessage}
+              onPrivateCall={handlePrivateCall}
+              onEmergency={handleEmergency}
+            />
 
-        <ActionButtons
-          onMessage={handleMessage}
-          onPrivateCall={handlePrivateCall}
-          onEmergency={handleEmergency}
-        />
+            <OwnerLoginSection onLoginClick={handleLoginClick} />
+          </main>
 
-        <OwnerLoginSection onLoginClick={handleLoginClick} />
-      </main>
+          <MessageModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            selectedReason={selectedReason}
+            onSend={handleSendMessage}
+            reasonOptions={reasonOptions}
+          />
 
-      <MessageModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        selectedReason={selectedReason}
-        onSend={handleSendMessage}
-        reasonOptions={reasonOptions}
-      />
-
-      <OwnerLoginModal
-        isOpen={isOwnerLoginModalOpen}
-        onClose={() => setIsOwnerLoginModalOpen(false)}
-        onSubmit={handleOwnerFormSubmit}
-      />
+          <OwnerLoginModal
+            isOpen={isOwnerLoginModalOpen}
+            onClose={() => setIsOwnerLoginModalOpen(false)}
+            onSubmit={handleOwnerFormSubmit}
+          />
+        </>
+      )}
+      {!vehicleOwner && !isLoading && <EmptyState />}
+      {isLoading && <div>Loading...</div>}
     </div>
   );
 }
