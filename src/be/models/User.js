@@ -64,38 +64,6 @@ const userSchema = new mongoose.Schema(
       trim: true,
       maxlength: 250,
     },
-
-    // Medical info (optional but important)
-    blood_group: {
-      type: String,
-      trim: true,
-    },
-
-    allergies: {
-      type: String,
-      trim: true,
-      maxlength: 200,
-    },
-
-    // QR Tag reference (1 user = 1 QR)
-    qr_tag_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "QrTag",
-      unique: true,
-      sparse: true,
-      index: true,
-    },
-
-    role: {
-      type: String,
-      enum: ["admin", "user"],
-      default: "user",
-    },
-
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
   },
   { timestamps: true }
 );

@@ -2,7 +2,8 @@ import { Schema, model, models, Types } from "mongoose";
 
 const QrTagSchema = new Schema(
   {
-    qr_id: { type: String, required: true, unique: true, index: true },
+    
+    type: { type: String, enum: ["vehicle", "personal"], required: false },
 
     // Only reference to batch
     batch_ref: { type: Types.ObjectId, ref: "QrBatch", required: true, index: true },
@@ -11,7 +12,7 @@ const QrTagSchema = new Schema(
     user_id: { type: Types.ObjectId, ref: "User", unique: true, sparse: true, index: true },
 
     status: { type: String, enum: ["unassigned", "active", "disabled"], default: "unassigned" },
-    isActive: { type: Boolean, default: true },
+    isActive: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

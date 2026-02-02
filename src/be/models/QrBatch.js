@@ -4,9 +4,10 @@ const QrBatchSchema = new Schema(
   {
     batch_id: { type: String, required: true, unique: true, index: true }, // BATCH001
     qty: { type: Number, required: true, min: 1 }, // 100
-    created_by: { type: Types.ObjectId, ref: "User", required: true },
+    //created_by: { type: Types.ObjectId, ref: "User", required: true },
 
     note: { type: String, trim: true },
+    status: { type: String, enum: ["new","generating","created", "in-printing", "distributed"], default: "created" },
   },
   { timestamps: true }
 );
