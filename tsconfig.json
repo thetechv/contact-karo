@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@framework/*": ["./src/be/framework/*"],
+      "@service/*": ["./src/be/services/*"]
     }
   },
   "include": [
