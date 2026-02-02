@@ -123,14 +123,29 @@ class QrTagService extends Service {
   async activateQr(req, res) {
     const session = await mongoose.startSession();
     try {
-      const { qr_id, user_id } = req.body || {};
-      if (!qr_id || !user_id) {
-        return res.status(400).json({ success: false, message: "qr_id and user_id are required" });
+      const tagId = this.getId(req);
+      const {
+        name,
+        phone,
+        whatsapp,
+        email,
+        vehicle_no,
+        vehicle_type,
+        emergency_contact_1,
+        emergency_contact_2,
+        address,
+      } = req.body || {};
+      if (!tagId) {
+        return res.status(400).json({ success: false, message: "tag id is required" });
+      }
+      if (!name || !phone || !email || !vehicle_no || !emergency_contact_1) {
+        return res.status(400).json({ success: false, message: "name, phone, email, vehicle_no, emergency_contact_1 are required" });
       }
 
+      await User.createCollection();
       session.startTransaction();
 
-      const tag = await QrTag.findOne({ qr_id }).session(session);
+      const tag = await QrTag.findById(tagId).session(session);
       if (!tag) {
         await session.abortTransaction();
         return res.status(404).json({ success: false, message: "QR not found" });
@@ -140,17 +155,22 @@ class QrTagService extends Service {
         return res.status(409).json({ success: false, message: "QR already assigned or not available" });
       }
 
-      const user = await User.findById(user_id).session(session);
-      if (!user) {
-        await session.abortTransaction();
-        return res.status(404).json({ success: false, message: "User not found" });
-      }
-
-      // enforce 1 user = 1 qr
-      if (user.qr_tag_id) {
-        await session.abortTransaction();
-        return res.status(409).json({ success: false, message: "User already has a QR assigned" });
-      }
+      const [user] = await User.create(
+        [
+          {
+            name,
+            phone,
+            whatsapp,
+            email,
+            vehicle_no,
+            vehicle_type,
+            emergency_contact_1,
+            emergency_contact_2,
+            address,
+          },
+        ],
+        { session }
+      );
 
       tag.user_id = user._id;
       tag.status = "active";
@@ -160,9 +180,9 @@ class QrTagService extends Service {
       await user.save({ session });
 
       await session.commitTransaction();
-      return res.status(200).json({ success: true, data: { qr_id, user_id, tag_id: tag._id } });
+      return res.status(200).json({ success: true, data: { tag_id: tag._id, user_id: user._id } });
     } catch (err) {
-      try { await session.abortTransaction(); } catch (_) {}
+      try { await session.abortTransaction(); } catch {}
       return res.status(500).json({ success: false, message: err?.message || "Server error" });
     } finally {
       session.endSession();

@@ -12,7 +12,6 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: [true, "Phone number is required"],
-      unique: true,
       trim: true,
       index: true,
     },
@@ -25,7 +24,6 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: [true, "Email is required"],
-      unique: true,
       lowercase: true,
       trim: true,
     },
@@ -34,7 +32,6 @@ const userSchema = new mongoose.Schema(
     vehicle_no: {
       type: String,
       required: [true, "Vehicle number is required"],
-      unique: true,
       uppercase: true,
       trim: true,
       index: true,
