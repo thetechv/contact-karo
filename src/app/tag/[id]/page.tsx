@@ -10,9 +10,10 @@ import {
   OwnerLoginSection,
   OwnerLoginModal,
   EmptyState,
+  RegisterModal,
 } from "@/fe/module/home/components";
 import { ThemeToggle } from "@/fe/components/ui/ThemeToggle";
-import { reasonOptions } from "@/fe/module/home/constants";
+import { reasonOptions, type VehicleOwner } from "@/fe/module/home/constants";
 import {
   useVehicleOwner,
   useVehicleActions,
@@ -24,13 +25,14 @@ export default function HomePage() {
   const params = useParams();
   const idParam = params?.id;
   const id = Array.isArray(idParam)
-    ? idParam[0] ?? ""
-    : (idParam as string | undefined) ?? "";
+    ? (idParam[0] ?? "")
+    : ((idParam as string | undefined) ?? "");
 
   const [selectedReason, setSelectedReason] = useState<string | null>(
-    "no-parking"
+    "no-parking",
   );
   const [isOwnerLoginModalOpen, setIsOwnerLoginModalOpen] = useState(false);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const { isLoading, vehicleOwner } = useVehicleOwner(id);
 
   const {
@@ -54,6 +56,16 @@ export default function HomePage() {
     console.log("Owner details submitted:", data);
     // TODO: Send data to API
     setIsOwnerLoginModalOpen(false);
+  };
+
+  const handleRegisterClick = () => {
+    setIsRegisterModalOpen(true);
+  };
+
+  const handleRegisterSubmit = (data: VehicleOwner) => {
+    console.log("Vehicle registered:", data);
+    // TODO: Send data to API
+    setIsRegisterModalOpen(false);
   };
 
   return (
@@ -97,7 +109,16 @@ export default function HomePage() {
           />
         </>
       )}
-      {!vehicleOwner && !isLoading && <EmptyState />}
+      {!vehicleOwner && !isLoading && (
+        <>
+          <EmptyState onRegisterClick={handleRegisterClick} />
+          <RegisterModal
+            isOpen={isRegisterModalOpen}
+            onClose={() => setIsRegisterModalOpen(false)}
+            onSubmit={handleRegisterSubmit}
+          />
+        </>
+      )}
       {isLoading && <div>Loading...</div>}
     </div>
   );
