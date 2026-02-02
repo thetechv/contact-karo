@@ -1,6 +1,6 @@
 class ApiService {
   constructor() {
-    this.BASE_URL = 'http://localhost:3000/api/v0';
+    this.BASE_URL = 'https://contact-karo.vercel.app/api/v0';
   }
   async get(path){
     const response = await fetch(`${this.BASE_URL}/${path}`, {
