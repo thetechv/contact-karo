@@ -8,6 +8,7 @@ import {
   MessageModal,
   OwnerLoginSection,
   OwnerLoginModal,
+  EmptyState,
 } from "@/module/home/components";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { reasonOptions } from "@/module/home/constants";
@@ -49,7 +50,7 @@ export default function HomePage() {
   };
 
   if (!vehicleOwner) {
-    return null;
+    return <EmptyState />;
   }
 
   return (

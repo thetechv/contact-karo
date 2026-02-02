@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getRandomVehicleOwner, VehicleOwner } from "../constants";
+import { getRandomVehicleOwner, type VehicleOwner } from "../constants";
 
 export function useVehicleOwner() {
   const [vehicleOwner, setVehicleOwner] = useState<VehicleOwner | null>(null);
