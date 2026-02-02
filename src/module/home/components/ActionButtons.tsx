@@ -7,14 +7,12 @@ import { actionButtonStyles } from "@/module/home/styles/actionStyles";
 interface ActionButtonsProps {
   onMessage: () => void;
   onPrivateCall: () => void;
-  onDocuments: () => void;
   onEmergency: () => void;
 }
 
 export const ActionButtons: React.FC<ActionButtonsProps> = ({
   onMessage,
   onPrivateCall,
-  onDocuments,
   onEmergency,
 }) => {
   return (
@@ -34,11 +32,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       </div>
 
       {/* Secondary Actions */}
-      <div className="grid grid-cols-2 gap-3">
-        <button onClick={onDocuments} className={actionButtonStyles.documents}>
-          Documents
-        </button>
-
+      <div className="w-full">
         <button onClick={onEmergency} className={actionButtonStyles.emergency}>
           <span className="text-lg">🚨</span>
           <span>Emergency</span>

@@ -15,5 +15,5 @@ export const actionButtonStyles = {
   documents:
     "px-6 py-3.5 bg-white dark:bg-gray-800 border-2 border-gray-900 dark:border-gray-300 text-gray-900 dark:text-white font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200",
   emergency:
-    "px-6 py-3.5 bg-red-600 border-2 border-red-600 text-white font-semibold rounded-xl hover:bg-red-700 hover:border-red-700 transition-all duration-200 flex items-center justify-center gap-2",
+    "w-full px-6 py-3.5 bg-red-600 border-2 border-red-600 text-white font-semibold rounded-xl hover:bg-red-700 hover:border-red-700 transition-all duration-200 flex items-center justify-center gap-2",
 };

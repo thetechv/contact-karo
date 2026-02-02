@@ -5,7 +5,9 @@ import {
   VehicleInfo,
   ReasonSelector,
   ActionButtons,
+  MessageModal,
 } from "@/module/home/components";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import {
   getRandomVehicleOwner,
   type VehicleOwner,
@@ -16,6 +18,7 @@ export default function HomePage() {
     "no-parking",
   );
   const [vehicleOwner, setVehicleOwner] = useState<VehicleOwner | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Load a random vehicle owner on component mount
   useEffect(() => {
@@ -56,16 +59,41 @@ export default function HomePage() {
   ];
 
   const handleMessage = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleSendMessage = (
+    additionalMessage: string,
+    phoneNumber: string,
+  ) => {
     console.log("Message action:", selectedReason);
     console.log("Vehicle Owner:", vehicleOwner);
-    // Handle WhatsApp message
-    const message = encodeURIComponent(
-      `Hi ${vehicleOwner.name}, I need to contact you regarding your vehicle ${vehicleOwner.vehicle_no}. Reason: ${selectedReason}`,
-    );
+    console.log("Additional Message:", additionalMessage);
+    console.log("User Phone:", phoneNumber);
+
+    // Find the selected reason label
+    const selectedReasonLabel =
+      reasonOptions.find((r) => r.id === selectedReason)?.label || "";
+
+    // Build the WhatsApp message
+    let message = `Hi ${vehicleOwner.name}, I need to contact you regarding your vehicle ${vehicleOwner.vehicle_no}.\n\nReason: ${selectedReasonLabel}`;
+
+    if (additionalMessage) {
+      message += `\n\nAdditional Details: ${additionalMessage}`;
+    }
+
+    if (phoneNumber) {
+      message += `\n\nYou can reach me at: ${phoneNumber}`;
+    }
+
+    const encodedMessage = encodeURIComponent(message);
     window.open(
-      `https://wa.me/${vehicleOwner.whatsapp}?text=${message}`,
+      `https://wa.me/${vehicleOwner.whatsapp}?text=${encodedMessage}`,
       "_blank",
     );
+
+    // Close modal
+    setIsModalOpen(false);
   };
 
   const handlePrivateCall = () => {
@@ -106,21 +134,7 @@ export default function HomePage() {
               Karo
             </span>
           </div>
-          <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
-            <svg
-              className="w-6 h-6 text-gray-900 dark:text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
+          <ThemeToggle />
         </div>
       </header>
 
@@ -144,7 +158,6 @@ export default function HomePage() {
         <ActionButtons
           onMessage={handleMessage}
           onPrivateCall={handlePrivateCall}
-          onDocuments={handleDocuments}
           onEmergency={handleEmergency}
         />
 
@@ -188,6 +201,15 @@ export default function HomePage() {
           </div>
         </div>
       </main>
+
+      {/* Message Modal */}
+      <MessageModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        selectedReason={selectedReason}
+        onSend={handleSendMessage}
+        reasonOptions={reasonOptions}
+      />
     </div>
   );
 }
