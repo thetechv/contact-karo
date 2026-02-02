@@ -7,15 +7,29 @@ import { vehicleInfoStyles } from "@/module/home/styles/vehicleStyles";
 interface VehicleInfoProps {
   vehicleName: string;
   plateNumber: string;
-  maskedDigits: string;
+  vehicleType: string;
 }
 
 export const VehicleInfo: React.FC<VehicleInfoProps> = ({
   vehicleName,
   plateNumber,
-  maskedDigits,
+  vehicleType,
 }) => {
   const s = vehicleInfoStyles;
+
+  // Get appropriate icon based on vehicle type
+  const getVehicleIcon = () => {
+    switch (vehicleType.toLowerCase()) {
+      case "car":
+        return "🚗";
+      case "bike":
+        return "🏍️";
+      case "scooter":
+        return "🛵";
+      default:
+        return "🚗";
+    }
+  };
 
   return (
     <div className={s.container}>
@@ -23,9 +37,14 @@ export const VehicleInfo: React.FC<VehicleInfoProps> = ({
 
       <div className={s.plateContainer}>
         <div className={s.plateWrapper}>
-          <span className={s.plateIcon}>🔵</span>
+          <span className={s.plateIcon}>{getVehicleIcon()}</span>
           <span className={s.plateNumber}>{plateNumber}</span>
         </div>
+        {vehicleName && (
+          <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-2">
+            Owner: {vehicleName}
+          </p>
+        )}
       </div>
 
       <p className={s.description}>
