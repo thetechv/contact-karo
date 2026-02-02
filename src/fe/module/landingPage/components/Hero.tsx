@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui";
+import { Button } from "@/fe/components/ui";
 
 export const Hero: React.FC = () => {
   return (

@@ -6,7 +6,7 @@ import {
   HowItWorks,
   CTA,
   Footer,
-} from "@/module/landingPage/components";
+} from "@/fe/module/landingPage/components";
 
 export const metadata: Metadata = {
   title:

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button, ThemeToggle } from "@/components/ui";
+import { Button, ThemeToggle } from "@/fe/components/ui";
 
 export const Navbar: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);

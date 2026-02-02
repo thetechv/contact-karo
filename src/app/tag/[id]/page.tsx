@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useParams } from "next/navigation";
 import {
   VehicleInfo,
   ReasonSelector,
@@ -9,22 +10,27 @@ import {
   OwnerLoginSection,
   OwnerLoginModal,
   EmptyState,
-} from "@/module/home/components";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { reasonOptions } from "@/module/home/constants";
+} from "@/fe/module/home/components";
+import { ThemeToggle } from "@/fe/components/ui/ThemeToggle";
+import { reasonOptions } from "@/fe/module/home/constants";
 import {
   useVehicleOwner,
   useVehicleActions,
   type OwnerFormData,
-} from "@/module/home/hooks";
-import { pageStyles } from "@/module/home/styles/pageStyles";
+} from "@/fe/module/home/hooks";
+import { pageStyles } from "@/fe/module/home/styles/pageStyles";
 
 export default function HomePage() {
+  const params = useParams();
+  const idParam = params?.id;
+  const id =
+    Array.isArray(idParam) ? idParam[0] ?? "" : (idParam as string | undefined) ?? "";
+
   const [selectedReason, setSelectedReason] = useState<string | null>(
     "no-parking",
   );
   const [isOwnerLoginModalOpen, setIsOwnerLoginModalOpen] = useState(false);
-  const vehicleOwner = useVehicleOwner();
+  const vehicleOwner = useVehicleOwner(id);
 
   const {
     isModalOpen,
@@ -48,6 +54,7 @@ export default function HomePage() {
     // TODO: Send data to API
     setIsOwnerLoginModalOpen(false);
   };
+
 
   if (!vehicleOwner) {
     return <EmptyState />;

@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/Button";
-import { actionButtonStyles } from "@/module/home/styles/actionStyles";
+import { actionButtonStyles } from "@/fe/module/home/styles/actionStyles";
 
 interface ActionButtonsProps {
   onMessage: () => void;

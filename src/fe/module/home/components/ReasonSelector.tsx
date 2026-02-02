@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { reasonSelectorStyles } from "@/module/home/styles/reasonStyles";
+import { reasonSelectorStyles } from "@/fe/module/home/styles/reasonStyles";
 
 interface ReasonOption {
   id: string;

@@ -21,7 +21,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "@framework/*": ["./src/be/framework/*"],
-      "@service/*": ["./src/be/services/*"]
+      "@service/*": ["./src/be/services/*"],
+      "@components/*": ["./src/fe/components/*"]
     }
   },
   "include": [

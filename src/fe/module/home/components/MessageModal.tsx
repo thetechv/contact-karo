@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { messageModalStyles } from "@/module/home/styles/modalStyles";
+import { messageModalStyles } from "@/fe/module/home/styles/modalStyles";
 
 interface MessageModalProps {
   isOpen: boolean;

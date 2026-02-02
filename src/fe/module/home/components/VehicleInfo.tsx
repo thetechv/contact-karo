@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { Card } from "@/components/ui/Card";
-import { vehicleInfoStyles } from "@/module/home/styles/vehicleStyles";
+import { Card } from "@/fe/components/ui/Card";
+import { vehicleInfoStyles } from "@/fe/module/home/styles/vehicleStyles";
 
 interface VehicleInfoProps {
   vehicleName: string;
