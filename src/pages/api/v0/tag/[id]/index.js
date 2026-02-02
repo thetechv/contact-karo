@@ -1,5 +1,5 @@
-import { PublicController } from "../../../../be/framework/publicController";
-import QrTagService from "../../../../be/services/QrTagService";
+import { PublicController } from "@framework/publicController";
+import QrTagService from "@service/QrTagService";
 
 class QrTagByIdController extends PublicController {
   constructor() {
