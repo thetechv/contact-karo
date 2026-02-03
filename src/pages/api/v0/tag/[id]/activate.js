@@ -7,6 +7,7 @@ class QrTagAssignController extends PublicController {
     this.service = new QrTagService();
   }
   async post(req, res) {
+    // TODO: Only run if otp is there and valid and not expired
     return this.service.activateQr(req, res);
   }
 }
