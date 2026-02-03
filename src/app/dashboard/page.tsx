@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 
 type Batch = {
   _id: string;
@@ -53,8 +54,26 @@ export default function DashboardPage() {
     }
   };
 
+  const router = useRouter();
+
   useEffect(() => {
-    void loadBatches();
+    const checkAuthAndLoad = async () => {
+      try {
+        const res = await fetch("/api/v0/employee", { method: "GET" });
+        if (res.status === 401) {
+          router.push("/login");
+          return;
+        }
+      } catch (err) {
+        // if network error, redirect to login to be safe
+        router.push("/login");
+        return;
+      }
+
+      void loadBatches();
+    };
+
+    void checkAuthAndLoad();
   }, []);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -96,11 +115,30 @@ export default function DashboardPage() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/v0/employee/logout", { method: "POST" });
+    } catch (err) {
+      // ignore
+    }
+    router.push("/login");
+  };
+
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-10">
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-semibold text-slate-900">Dashboard</h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-semibold text-slate-900">Dashboard</h1>
+            <div>
+              <button
+                onClick={handleLogout}
+                className="rounded-lg border border-slate-900 px-3 py-1 text-sm font-semibold text-slate-900 hover:bg-slate-900 hover:text-white"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
           <p className="text-sm text-slate-600">
             Quick form to add a batch with name, notes, and quantity.
           </p>
