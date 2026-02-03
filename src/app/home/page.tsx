@@ -55,10 +55,9 @@ export default function HomePage() {
     setIsRegisterModalOpen(true);
   };
 
-  const handleRegisterSubmit = (data: VehicleOwner) => {
-    console.log("Vehicle registered:", data);
-    // TODO: Send data to API
-    setIsRegisterModalOpen(false);
+  const handleRegisterSuccess = () => {
+    // Refresh the page to show newly registered vehicle
+    window.location.reload();
   };
 
   if (!vehicleOwner) {
@@ -68,7 +67,8 @@ export default function HomePage() {
         <RegisterModal
           isOpen={isRegisterModalOpen}
           onClose={() => setIsRegisterModalOpen(false)}
-          onSubmit={handleRegisterSubmit}
+          tagId=""
+          onSuccess={handleRegisterSuccess}
         />
       </>
     );
