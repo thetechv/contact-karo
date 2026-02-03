@@ -11,7 +11,6 @@ import {
   EmptyState,
   RegisterModal,
 } from "@/fe/module/home/components";
-import { ThemeToggle } from "@/fe/components/ui/ThemeToggle";
 import { reasonOptions, type VehicleOwner } from "@/fe/module/home/constants";
 import {
   useVehicleOwner,
@@ -82,7 +81,6 @@ export default function HomePage() {
             <h1 className={pageStyles.title}>Contact</h1>
             <span className={pageStyles.badge}>Karo</span>
           </div>
-          <ThemeToggle />
         </div>
       </header>
 

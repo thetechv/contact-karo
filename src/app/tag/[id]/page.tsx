@@ -12,7 +12,6 @@ import {
   EmptyState,
   RegisterModal,
 } from "@/fe/module/home/components";
-import { ThemeToggle } from "@/fe/components/ui/ThemeToggle";
 import { reasonOptions, type VehicleOwner } from "@/fe/module/home/constants";
 import {
   useVehicleOwner,

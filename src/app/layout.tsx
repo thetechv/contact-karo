@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { pageStyles } from "@/fe/module/home/styles/pageStyles";
-import { ThemeToggle } from "@/fe/components/ui/ThemeToggle";
 
 import { ThemeProvider } from "@/fe/components/theme-provider";
 
@@ -48,7 +47,6 @@ export default function RootLayout({
                 <h1 className={pageStyles.title}>Contact</h1>
                 <span className={pageStyles.badge}>Karo</span>
               </div>
-              <ThemeToggle />
             </div>
           </header>
           {children}
