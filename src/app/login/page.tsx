@@ -39,8 +39,12 @@ export default function LoginPage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-6 py-12">
       <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="mb-2 text-2xl font-semibold text-slate-900">Employee Login</h1>
-        <p className="mb-6 text-sm text-slate-600">Sign in with your email and password to continue.</p>
+        <h1 className="mb-2 text-2xl font-semibold text-slate-900">
+          Employee Login
+        </h1>
+        <p className="mb-6 text-sm text-slate-600">
+          Sign in with your email and password to continue.
+        </p>
 
         <form onSubmit={handleSubmit} className="grid gap-4">
           <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
@@ -51,6 +55,8 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-400"
               required
+              autoComplete="email"
+              suppressHydrationWarning
             />
           </label>
 
@@ -62,10 +68,14 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-400"
               required
+              autoComplete="current-password"
+              suppressHydrationWarning
             />
           </label>
 
-          {error ? <p className="text-sm font-medium text-red-600">{error}</p> : null}
+          {error ? (
+            <p className="text-sm font-medium text-red-600">{error}</p>
+          ) : null}
 
           <div className="flex items-center justify-end">
             <button
