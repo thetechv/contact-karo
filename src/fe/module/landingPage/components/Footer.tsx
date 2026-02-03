@@ -156,7 +156,7 @@ export const Footer: React.FC = () => {
             © {currentYear} ContactKaro. All rights reserved.
             <span className="mx-2">|</span>
             <a
-              href="https://techv.in"
+              href="https://thetechv.in"
               target="_blank"
               rel="noreferrer"
               className="hover:text-yellow-400 transition-colors inline-flex items-center"
