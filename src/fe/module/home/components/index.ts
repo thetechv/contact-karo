@@ -7,5 +7,6 @@ export { OwnerLoginModal } from "./OwnerLoginModal";
 export { RegisterModal } from "./RegisterModal";
 export { FormInput } from "./FormInput";
 export { FormTextarea } from "./FormTextarea";
+export { FormSelect } from "./FormSelect";
 export { ModalHeader } from "./ModalHeader";
 export { EmptyState } from "./EmptyState";

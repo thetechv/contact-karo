@@ -1,10 +1,11 @@
 export interface FormFieldConfig {
   name: string;
   label: string;
-  type: "text" | "tel" | "email" | "textarea";
+  type: "text" | "tel" | "email" | "textarea" | "select";
   required: boolean;
   placeholder: string;
   rows?: number;
+  options?: { value: string; label: string }[];
 }
 
 export const registerFormFields: FormFieldConfig[] = [
@@ -46,9 +47,15 @@ export const registerFormFields: FormFieldConfig[] = [
   {
     name: "vehicle_type",
     label: "Vehicle Type",
-    type: "text",
+    type: "select",
     required: true,
-    placeholder: "Car / Bike / Scooter",
+    placeholder: "Select vehicle type",
+    options: [
+      { value: "car", label: "Car" },
+      { value: "bike", label: "Bike" },
+      { value: "scooter", label: "Scooter" },
+      { value: "other", label: "Other" },
+    ],
   },
   {
     name: "emergency_contact_1",

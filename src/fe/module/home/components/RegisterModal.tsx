@@ -6,6 +6,7 @@ import { registerFormFields } from "../constants";
 import { ownerModalStyles } from "../styles/ownerModalStyles";
 import { FormInput } from "./FormInput";
 import { FormTextarea } from "./FormTextarea";
+import { FormSelect } from "./FormSelect";
 import { ModalHeader } from "./ModalHeader";
 
 interface RegisterModalProps {
@@ -75,6 +76,17 @@ export function RegisterModal({
                 required={field.required}
                 placeholder={field.placeholder}
                 rows={field.rows || 3}
+                onChange={handleChange}
+              />
+            ) : field.type === "select" ? (
+              <FormSelect
+                key={field.name}
+                name={field.name}
+                label={field.label}
+                value={formData[field.name as keyof typeof formData] || ""}
+                required={field.required}
+                placeholder={field.placeholder}
+                options={field.options || []}
                 onChange={handleChange}
               />
             ) : (
