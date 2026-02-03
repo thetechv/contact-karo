@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRegisterForm } from "../hooks/useRegisterForm";
-import { registerFormFields, type VehicleOwner } from "../constants";
+import { registerFormFields } from "../constants";
 import { ownerModalStyles } from "../styles/ownerModalStyles";
 import { FormInput } from "./FormInput";
 import { FormTextarea } from "./FormTextarea";
@@ -11,15 +11,34 @@ import { ModalHeader } from "./ModalHeader";
 interface RegisterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: VehicleOwner) => void;
+  tagId: string;
+  onSuccess?: () => void;
 }
 
 export function RegisterModal({
   isOpen,
   onClose,
-  onSubmit,
+  tagId,
+  onSuccess,
 }: RegisterModalProps) {
-  const { formData, handleChange, handleSubmit } = useRegisterForm(onSubmit);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const handleSuccess = () => {
+    setSuccessMessage("Vehicle registered successfully!");
+    setTimeout(() => {
+      setSuccessMessage(null);
+      onClose();
+      onSuccess?.();
+    }, 2000);
+  };
+
+  const handleError = (errorMessage: string) => {
+    setError(errorMessage);
+  };
+
+  const { formData, handleChange, handleSubmit, isSubmitting } =
+    useRegisterForm(tagId, handleSuccess, handleError);
 
   if (!isOpen) return null;
 
@@ -29,6 +48,18 @@ export function RegisterModal({
 
       <div className={ownerModalStyles.modal}>
         <ModalHeader title="Register Your Vehicle" onClose={onClose} />
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-400 rounded-lg">
+            {error}
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="mb-4 p-3 bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-400 rounded-lg">
+            {successMessage}
+          </div>
+        )}
 
         <form
           onSubmit={handleSubmit}
@@ -40,7 +71,7 @@ export function RegisterModal({
                 key={field.name}
                 name={field.name}
                 label={field.label}
-                value={formData[field.name as keyof VehicleOwner] || ""}
+                value={formData[field.name as keyof typeof formData] || ""}
                 required={field.required}
                 placeholder={field.placeholder}
                 rows={field.rows || 3}
@@ -52,7 +83,7 @@ export function RegisterModal({
                 name={field.name}
                 label={field.label}
                 type={field.type as "text" | "tel" | "email"}
-                value={formData[field.name as keyof VehicleOwner] || ""}
+                value={formData[field.name as keyof typeof formData] || ""}
                 required={field.required}
                 placeholder={field.placeholder}
                 onChange={handleChange}
@@ -60,8 +91,12 @@ export function RegisterModal({
             ),
           )}
 
-          <button type="submit" className={ownerModalStyles.form.submitButton}>
-            Register Vehicle
+          <button
+            type="submit"
+            className={ownerModalStyles.form.submitButton}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Registering..." : "Register Vehicle"}
           </button>
         </form>
       </div>

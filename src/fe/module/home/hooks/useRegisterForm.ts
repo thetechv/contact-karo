@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { VehicleOwner } from "../constants";
+import tagService from "@/fe/services/tagService";
 
 const initialFormState: VehicleOwner = {
   name: "",
@@ -13,8 +14,13 @@ const initialFormState: VehicleOwner = {
   address: "",
 };
 
-export function useRegisterForm(onSubmit: (data: VehicleOwner) => void) {
+export function useRegisterForm(
+  tagId: string,
+  onSuccess: () => void,
+  onError: (error: string) => void,
+) {
   const [formData, setFormData] = useState<VehicleOwner>(initialFormState);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -23,10 +29,24 @@ export function useRegisterForm(onSubmit: (data: VehicleOwner) => void) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
-    setFormData(initialFormState);
+    setIsSubmitting(true);
+
+    try {
+      const response = await tagService.activateTag(tagId, formData);
+
+      if (response.success) {
+        setFormData(initialFormState);
+        onSuccess();
+      } else {
+        onError(response.message || "Failed to register vehicle");
+      }
+    } catch (error: any) {
+      onError(error?.message || "An error occurred while registering");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const resetForm = () => {
@@ -38,5 +58,6 @@ export function useRegisterForm(onSubmit: (data: VehicleOwner) => void) {
     handleChange,
     handleSubmit,
     resetForm,
+    isSubmitting,
   };
 }
