@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button } from "@/fe/components/ui";
 
 export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,7 +18,7 @@ export const Navbar: React.FC = () => {
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-6">
           <a
-            href="#"
+            href="#home"
             className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
           >
             Home
@@ -53,7 +52,7 @@ export const Navbar: React.FC = () => {
       {isOpen && (
         <div className="md:hidden absolute top-20 left-0 w-full bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 p-6 flex flex-col gap-4 shadow-xl animate-in slide-in-from-top-5">
           <a
-            href="#"
+            href="#home"
             className="text-lg font-medium text-gray-900 dark:text-gray-100 py-2 border-b border-gray-50 dark:border-gray-800"
           >
             Home
