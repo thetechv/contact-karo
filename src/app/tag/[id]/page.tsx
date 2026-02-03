@@ -32,7 +32,7 @@ export default function HomePage() {
   );
   const [isOwnerLoginModalOpen, setIsOwnerLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
-  const { isLoading, vehicleOwner } = useVehicleOwner(id);
+  const { isLoading, vehicleOwner, error } = useVehicleOwner(id);
 
   const {
     isModalOpen,
@@ -68,7 +68,27 @@ export default function HomePage() {
 
   return (
     <div className={pageStyles.container}>
-      {vehicleOwner && !isLoading && (
+      {isLoading && (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+          </div>
+        </div>
+      )}
+
+      {error && !isLoading && (
+        <div className="flex items-center justify-center min-h-screen p-4">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-lg p-6 max-w-md">
+            <h2 className="text-red-800 dark:text-red-400 font-semibold mb-2">
+              Error Loading Tag
+            </h2>
+            <p className="text-red-600 dark:text-red-300">{error}</p>
+          </div>
+        </div>
+      )}
+
+      {vehicleOwner && !isLoading && !error && (
         <>
           <main className={pageStyles.main}>
             <VehicleInfo
@@ -107,7 +127,8 @@ export default function HomePage() {
           />
         </>
       )}
-      {!vehicleOwner && !isLoading && (
+
+      {!vehicleOwner && !isLoading && !error && (
         <>
           <EmptyState onRegisterClick={handleRegisterClick} />
           <RegisterModal
@@ -118,7 +139,6 @@ export default function HomePage() {
           />
         </>
       )}
-      {isLoading && <div>Loading...</div>}
     </div>
   );
 }

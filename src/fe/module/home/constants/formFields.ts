@@ -48,7 +48,7 @@ export const registerFormFields: FormFieldConfig[] = [
     name: "vehicle_type",
     label: "Vehicle Type",
     type: "select",
-    required: true,
+    required: false,
     placeholder: "Select vehicle type",
     options: [
       { value: "car", label: "Car" },
@@ -75,8 +75,8 @@ export const registerFormFields: FormFieldConfig[] = [
     name: "address",
     label: "Address",
     type: "textarea",
-    required: true,
-    placeholder: "Enter your full address",
+    required: false,
+    placeholder: "Enter your full address (Optional)",
     rows: 2,
   },
 ];
