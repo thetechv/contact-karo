@@ -23,6 +23,43 @@ export function OwnerLoginModal({
 
   if (!isOpen) return null;
 
+  const renderField = (field: (typeof ownerFormFields)[0]) => {
+    const fieldElement =
+      field.type === "textarea" ? (
+        <FormTextarea
+          name={field.name}
+          label={field.label}
+          value={formData[field.name as keyof OwnerFormData]}
+          required={field.required}
+          placeholder={field.placeholder}
+          rows={field.rows || 3}
+          onChange={handleChange}
+        />
+      ) : (
+        <FormInput
+          name={field.name}
+          label={field.label}
+          type={field.type as "text" | "tel" | "email"}
+          value={formData[field.name as keyof OwnerFormData]}
+          required={field.required}
+          placeholder={field.placeholder}
+          onChange={handleChange}
+        />
+      );
+
+    // Full-width fields
+    const isFullWidth = ["address", "email"].includes(field.name);
+
+    return (
+      <div
+        key={field.name}
+        className={isFullWidth ? ownerModalStyles.form.fullWidth : ""}
+      >
+        {fieldElement}
+      </div>
+    );
+  };
+
   return (
     <div className={ownerModalStyles.overlay}>
       <div className={ownerModalStyles.backdrop} onClick={onClose} />
@@ -34,34 +71,12 @@ export function OwnerLoginModal({
           onSubmit={handleSubmit}
           className={ownerModalStyles.form.container}
         >
-          {ownerFormFields.map((field) =>
-            field.type === "textarea" ? (
-              <FormTextarea
-                key={field.name}
-                name={field.name}
-                label={field.label}
-                value={formData[field.name as keyof OwnerFormData]}
-                required={field.required}
-                placeholder={field.placeholder}
-                rows={field.rows || 3}
-                onChange={handleChange}
-              />
-            ) : (
-              <FormInput
-                key={field.name}
-                name={field.name}
-                label={field.label}
-                type={field.type as "text" | "tel" | "email"}
-                value={formData[field.name as keyof OwnerFormData]}
-                required={field.required}
-                placeholder={field.placeholder}
-                onChange={handleChange}
-              />
-            ),
-          )}
+          <div className={ownerModalStyles.form.grid}>
+            {ownerFormFields.map(renderField)}
+          </div>
 
           <button type="submit" className={ownerModalStyles.form.submitButton}>
-            Submit Details
+            Submit Details ✓
           </button>
         </form>
       </div>
