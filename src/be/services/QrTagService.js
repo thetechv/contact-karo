@@ -4,6 +4,7 @@ import QrTag from "../models/QrTag";
 import QrBatch from "../models/QrBatch";
 import User from "../models/User";
 import mongoose from "mongoose";
+import twilio from "../lib/twilio";
 
 class QrTagService extends Service {
   constructor() {
@@ -119,12 +120,73 @@ class QrTagService extends Service {
     }
   }
 
+  // ✅ Generate and send OTP for tag
+  async generateOtp(req, res) {
+    try {
+      const tagId = this.getId(req);
+      const phone = req?.body?.phone;
+
+      if (!tagId || !phone) {
+        return res.status(400).json({ success: false, message: "tagId and phone are required" });
+      }
+
+      // Validate ObjectId format
+      if (!mongoose.Types.ObjectId.isValid(tagId)) {
+        return res.status(400).json({ success: false, message: "Invalid QR tag ID." });
+      }
+
+      // Check if tag exists
+      const tag = await QrTag.findById(tagId).lean();
+      if (!tag) {
+        return res.status(404).json({ success: false, message: "Tag not found" });
+      }
+
+      // Rate limiting: Check if OTP was sent recently (2 minutes cooldown)
+      if (tag.otp?.last_attempt_at) {
+        const timeSinceLastAttempt = Date.now() - new Date(tag.otp.last_attempt_at).getTime();
+        const twoMinutesInMs = 2 * 60 * 1000;
+
+        if (timeSinceLastAttempt < twoMinutesInMs) {
+          const remainingMs = twoMinutesInMs - timeSinceLastAttempt;
+          const remainingMinutes = Math.floor(remainingMs / 60000);
+          const remainingSeconds = Math.ceil((remainingMs % 60000) / 1000);
+          return res.status(429).json({ success: false, message: `Please wait ${remainingMinutes}m ${remainingSeconds}s before requesting a new OTP` });
+        }
+      }
+
+      // Generate OTP
+      const otp = Math.floor(100000 + Math.random() * 900000);
+
+      // Save OTP to tag with expiry (5 minutes)
+      const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+      await QrTag.findByIdAndUpdate(
+        tagId,
+        {
+          "otp.code": otp.toString(),
+          "otp.expires_at": expiresAt,
+          "otp.attempts": 0,
+          "otp.last_attempt_at": new Date(),
+        },
+        { new: true }
+      );
+      console.log(`Generated OTP for tag ${tagId}: ${otp}`);
+
+      // Send OTP via Twilio
+      await twilio.sendMessage(phone, `Your OTP is ${otp}`);
+
+      return res.status(200).json({ success: true, message: "OTP sent successfully" });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: err?.message || "Server error" });
+    }
+  }
+
   // ✅ Activate QR = assign tag to user and link back user.qr_tag_id
   async activateQr(req, res) {
     const session = await mongoose.startSession();
     try {
       const tagId = this.getId(req);
       const {
+        otp,
         name,
         phone,
         whatsapp,
@@ -135,9 +197,20 @@ class QrTagService extends Service {
         emergency_contact_2,
         address,
       } = req.body || {};
+      
       if (!tagId) {
         return res.status(400).json({ success: false, message: "tag id is required" });
       }
+
+      // Validate ObjectId format
+      if (!mongoose.Types.ObjectId.isValid(tagId)) {
+        return res.status(400).json({ success: false, message: "Invalid QR tag ID." });
+      }
+
+      if (!otp) {
+        return res.status(400).json({ success: false, message: "otp is required" });
+      }
+
       if (!name || !phone || !email || !vehicle_no || !emergency_contact_1) {
         return res.status(400).json({ success: false, message: "name, phone, email, vehicle_no, emergency_contact_1 are required" });
       }
@@ -150,6 +223,25 @@ class QrTagService extends Service {
         await session.abortTransaction();
         return res.status(404).json({ success: false, message: "QR not found" });
       }
+      console.log("Tag found:", tag);
+      // Check if OTP exists
+      if (!tag.otp?.code) {
+        await session.abortTransaction();
+        return res.status(400).json({ success: false, message: "OTP not sent for this tag" });
+      }
+
+      // Check if OTP is expired
+      if (new Date() > new Date(tag.otp.expires_at)) {
+        await session.abortTransaction();
+        return res.status(400).json({ success: false, message: "OTP has expired" });
+      }
+
+      // Check if OTP matches
+      if (tag.otp.code !== otp.toString()) {
+        await session.abortTransaction();
+        return res.status(400).json({ success: false, message: "Invalid OTP" });
+      }
+
       if (tag.status !== "unassigned" || tag.user_id) {
         await session.abortTransaction();
         return res.status(409).json({ success: false, message: "QR already assigned or not available" });
@@ -174,6 +266,7 @@ class QrTagService extends Service {
 
       tag.user_id = user._id;
       tag.status = "active";
+      tag.otp = {}; // Clear OTP after successful activation
       await tag.save({ session });
 
       user.qr_tag_id = tag._id;
