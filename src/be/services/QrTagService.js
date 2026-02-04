@@ -273,12 +273,36 @@ class QrTagService extends Service {
       await user.save({ session });
 
       await session.commitTransaction();
+      await twilio.sendWhatsappMessage(phone, name, vehicle_no, "Registration");
       return res.status(200).json({ success: true, data: { tag_id: tag._id, user_id: user._id } });
     } catch (err) {
       try { await session.abortTransaction(); } catch {}
       return res.status(500).json({ success: false, message: err?.message || "Server error" });
     } finally {
       session.endSession();
+    }
+  }
+
+  async sendMessage(req, res) {
+    try {
+      const tagId = this.getId(req);
+      const { violation } = req.body || {};
+      const tag = await QrTag.findById(tagId).lean();
+      if (!tag) {
+        return res.status(404).json({ success: false, message: "Tag not found" });
+      }
+
+      if (tag.status !== "active" || !tag.user_id) {
+        return res.status(400).json({ success: false, message: "Tag is not active or not assigned" });
+      }
+      const user = await User.findById(tag.user_id).lean();
+      if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+      await twilio.sendWhatsappMessage(user.phone, user.name, user.vehicle_no, violation);
+      return res.status(200).json({ success: true, message: "Message sent successfully" });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: err?.message || "Server error" });
     }
   }
 }
