@@ -166,6 +166,7 @@ class QrTagService extends Service {
           "otp.expires_at": expiresAt,
           "otp.attempts": 0,
           "otp.last_attempt_at": new Date(),
+          "otp.phone": phone,
         },
         { new: true }
       );
@@ -185,7 +186,7 @@ class QrTagService extends Service {
     const session = await mongoose.startSession();
     try {
       const tagId = this.getId(req);
-      const {
+      let {
         otp,
         name,
         phone,
@@ -211,10 +212,6 @@ class QrTagService extends Service {
         return res.status(400).json({ success: false, message: "otp is required" });
       }
 
-      if (!name || !phone || !email || !vehicle_no || !emergency_contact_1) {
-        return res.status(400).json({ success: false, message: "name, phone, email, vehicle_no, emergency_contact_1 are required" });
-      }
-
       await User.createCollection();
       session.startTransaction();
 
@@ -224,6 +221,13 @@ class QrTagService extends Service {
         return res.status(404).json({ success: false, message: "QR not found" });
       }
       console.log("Tag found:", tag);
+      // If phone not provided during activation, use the phone saved with the OTP
+      if (!phone) phone = tag.otp?.phone;
+
+      if (!name || !phone || !email || !vehicle_no || !emergency_contact_1) {
+        await session.abortTransaction();
+        return res.status(400).json({ success: false, message: "name, phone, email, vehicle_no, emergency_contact_1 are required" });
+      }
       // Check if OTP exists
       if (!tag.otp?.code) {
         await session.abortTransaction();

@@ -17,6 +17,7 @@ const QrTagSchema = new Schema(
       expires_at: { type: Date, required: false },
       attempts: { type: Number, default: 0 },
       last_attempt_at: { type: Date, required: false },
+      phone: { type: String, required: false },
     },
     isActive: { type: Boolean, default: false },
   },

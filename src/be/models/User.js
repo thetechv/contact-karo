@@ -23,9 +23,11 @@ const userSchema = new mongoose.Schema(
 
     email: {
       type: String,
-      required: [true, "Email is required"],
+      required: false,
       lowercase: true,
       trim: true,
+      required: [true, "Email is required"],
+      sparse: true,
     },
 
     // Vehicle details (1 user = 1 vehicle)
