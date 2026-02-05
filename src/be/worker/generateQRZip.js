@@ -28,7 +28,7 @@ const generateQRZip = async (batchId, options = {}) => {
 
   for (const tag of tags) {
     const tagId = tag?._id?.toString();
-    const tagUrl = `https://contact-karo.vercel.app/tag/${tagId}`;
+    const tagUrl = `https://www.contactkaro.in/tag/${tagId}`;
     if (!tagId) continue;
     const pngBuffer = await QRCode.toBuffer(tagUrl, {
       type: "png",
