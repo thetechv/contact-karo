@@ -4,6 +4,8 @@ import QrTag from "../models/QrTag";
 import QrBatch from "../models/QrBatch";
 import User from "../models/User";
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
+import { serialize } from "cookie";
 import twilio from "../lib/twilio";
 
 class QrTagService extends Service {
@@ -93,14 +95,49 @@ class QrTagService extends Service {
 
   async updateTag(req, res) {
     try {
-      const id = this.getId(req);
+      const tagId = this.getId(req);
+      const userId = req?.user?._id;
       const updates = req.body || {};
-      if (!id) return res.status(400).json({ success: false, message: "id is required" });
 
-      const tag = await QrTag.findByIdAndUpdate(id, updates, { new: true, runValidators: true }).lean();
+      if (!tagId) return res.status(400).json({ success: false, message: "tagId is required" });
+      if (!userId) return res.status(401).json({ success: false, message: "User not authenticated" });
+
+      // Validate ObjectId format
+      if (!mongoose.Types.ObjectId.isValid(tagId)) {
+        return res.status(400).json({ success: false, message: "Invalid QR tag ID." });
+      }
+
+      // Verify tag ID matches token (single-tag bound token)
+      if (req.user.tagId !== tagId) {
+        return res.status(403).json({ success: false, message: "Token is for a different tag" });
+      }
+
+      // Get tag
+      const tag = await QrTag.findById(tagId).lean();
       if (!tag) return res.status(404).json({ success: false, message: "Tag not found" });
 
-      return res.status(200).json({ success: true, data: tag });
+      // Verify tag belongs to authenticated user
+      if (tag.user_id.toString() !== userId.toString()) {
+        return res.status(403).json({ success: false, message: "Unauthorized: Tag does not belong to the authenticated user" });
+      }
+
+      // Update user details (not tag)
+      const user = await User.findByIdAndUpdate(userId, updates, { new: true, runValidators: true }).lean();
+      if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+      // Clear the OTP verification cookie
+      res.setHeader(
+        "Set-Cookie",
+        serialize("token", "", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          expires: new Date(0),
+          sameSite: "lax",
+          path: "/",
+        })
+      );
+
+      return res.status(200).json({ success: true, message: "User details updated successfully", data: user });
     } catch (err) {
       return res.status(500).json({ success: false, message: err?.message || "Server error" });
     }
@@ -115,6 +152,153 @@ class QrTagService extends Service {
       if (!tag) return res.status(404).json({ success: false, message: "Tag not found" });
 
       return res.status(200).json({ success: true, message: "Tag deleted" });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: err?.message || "Server error" });
+    }
+  }
+
+  // Generate and send OTP for updating tag details.
+  async generateOtpToUpdateTag(req, res) {
+    try {
+      const tagId = this.getId(req);
+      const phone = req?.body?.phone;
+
+      if (!tagId || !phone) {
+        return res.status(400).json({ success: false, message: "tagId and phone are required" });
+      }
+
+      if (!mongoose.Types.ObjectId.isValid(tagId)) {
+        return res.status(400).json({ success: false, message: "Invalid QR tag ID." });
+      }
+
+      const tag = await QrTag.findById(tagId).lean();
+      if (!tag) return res.status(404).json({ success: false, message: "Tag not found" });
+
+      if (!tag.user_id) {
+        return res.status(400).json({ success: false, message: "Tag is not assigned to any user" });
+      }
+
+      const user = await User.findById(tag.user_id).select("phone").lean();
+      if (!user) return res.status(404).json({ success: false, message: "Assigned user not found" });
+
+      // Only allow if provided phone matches the phone of the assigned user
+      if ((user.phone || "").toString() !== phone.toString()) {
+        return res.status(403).json({ success: false, message: "Phone does not match assigned user" });
+      }
+
+      // Rate limiting: Check if OTP was sent recently (2 minutes cooldown)
+      if (tag.otp?.last_attempt_at) {
+        const timeSinceLastAttempt = Date.now() - new Date(tag.otp.last_attempt_at).getTime();
+        const twoMinutesInMs = 2 * 60 * 1000;
+
+        if (timeSinceLastAttempt < twoMinutesInMs) {
+          const remainingMs = twoMinutesInMs - timeSinceLastAttempt;
+          const remainingMinutes = Math.floor(remainingMs / 60000);
+          const remainingSeconds = Math.ceil((remainingMs % 60000) / 1000);
+          return res.status(429).json({ success: false, message: `Please wait ${remainingMinutes}m ${remainingSeconds}s before requesting a new OTP` });
+        }
+      }
+
+      // Generate OTP
+      const otp = Math.floor(100000 + Math.random() * 900000);
+
+      // Save OTP to tag with expiry (5 minutes)
+      const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+      await QrTag.findByIdAndUpdate(
+        tagId,
+        {
+          "otp.code": otp.toString(),
+          "otp.expires_at": expiresAt,
+          "otp.attempts": 0,
+          "otp.last_attempt_at": new Date(),
+          "otp.phone": phone,
+        },
+        { new: true }
+      );
+      console.log(`Generated update-OTP for tag ${tagId}: ${otp}`);
+
+      // Send OTP via Twilio
+      await twilio.sendMessage(phone, `Your OTP for updating tag details is ${otp}`);
+
+      return res.status(200).json({ success: true, message: "OTP sent successfully" });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: err?.message || "Server error" });
+    }
+  }
+
+  //verify OTP for updating tag details
+  async verifyOtp(req, res) {
+    try {
+      const tagId = this.getId(req);
+      const { otp, phone } = req.body || {};
+
+      if (!tagId || !otp) {
+        return res.status(400).json({ success: false, message: "tagId and otp are required" });
+      }
+
+      if (!mongoose.Types.ObjectId.isValid(tagId)) {
+        return res.status(400).json({ success: false, message: "Invalid QR tag ID." });
+      }
+
+      const tag = await QrTag.findById(tagId).lean();
+      if (!tag) return res.status(404).json({ success: false, message: "Tag not found" });
+
+      if (!tag.user_id) return res.status(400).json({ success: false, message: "Tag is not assigned to any user" });
+
+      // Ensure OTP was generated
+      if (!tag.otp?.code) return res.status(400).json({ success: false, message: "OTP not sent for this tag" });
+
+      // Optionally verify phone matches saved OTP phone
+      const otpPhone = tag.otp?.phone;
+      if (otpPhone && phone && otpPhone.toString() !== phone.toString()) {
+        return res.status(403).json({ success: false, message: "Phone does not match OTP phone" });
+      }
+
+      // Check expiry
+      if (new Date() > new Date(tag.otp.expires_at)) return res.status(400).json({ success: false, message: "OTP has expired" });
+
+      // Check attempts limit
+      if (typeof tag.otp.attempts === "number" && tag.otp.attempts >= 5) {
+        return res.status(429).json({ success: false, message: "Too many OTP attempts" });
+      }
+
+      // Match OTP
+      if (tag.otp.code !== otp.toString()) {
+        // increment attempts
+        await QrTag.findByIdAndUpdate(tagId, { $inc: { "otp.attempts": 1 }, "otp.last_attempt_at": new Date() }, { new: true });
+        return res.status(400).json({ success: false, message: "Invalid OTP" });
+      }
+
+      // OTP valid — fetch user
+      const user = await User.findById(tag.user_id).lean();
+      if (!user) return res.status(404).json({ success: false, message: "Assigned user not found" });
+
+      // Clear OTP
+      await QrTag.findByIdAndUpdate(tagId, { otp: {} }, { new: true });
+
+      // Get client IP
+      const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.connection.remoteAddress || req.socket.remoteAddress;
+
+      // Issue JWT token with tagId, userId, and IP
+      const token = jwt.sign(
+        { _id: user._id, tagId: tagId, ip: clientIp },
+        process.env.JWT_SECRET,
+        { expiresIn: "7m" }
+      );
+
+      res.setHeader(
+        "Set-Cookie",
+        serialize("token", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          maxAge: 7 * 60,
+          sameSite: "lax",
+          path: "/",
+        })
+      );
+
+      // Return user details (lean already has no methods)
+      return res.status(200).json({ success: true, message: "OTP verified", user });
     } catch (err) {
       return res.status(500).json({ success: false, message: err?.message || "Server error" });
     }
