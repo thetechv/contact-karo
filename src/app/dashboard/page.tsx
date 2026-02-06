@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 import { useRouter } from "next/navigation";
 
 type Batch = {
@@ -47,7 +53,8 @@ export default function DashboardPage() {
       }
       setBatches(payload?.data || []);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to load batches.";
+      const message =
+        error instanceof Error ? error.message : "Failed to load batches.";
       setErrorMessage(message);
     } finally {
       setIsLoading(false);
@@ -76,7 +83,9 @@ export default function DashboardPage() {
     void checkAuthAndLoad();
   }, []);
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = event.target;
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
@@ -108,7 +117,8 @@ export default function DashboardPage() {
       setFormState(initialFormState);
       await loadBatches();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to create batch.";
+      const message =
+        error instanceof Error ? error.message : "Failed to create batch.";
       setErrorMessage(message);
     } finally {
       setIsSubmitting(false);
@@ -126,54 +136,75 @@ export default function DashboardPage() {
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-10">
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-gray-300 dark:border-gray-700 bg-gradient-to-br from-yellow-400 to-yellow-500 p-6 shadow-xl">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold text-slate-900">Dashboard</h1>
             <div>
+              <h1 className="text-3xl font-extrabold text-black tracking-tight">
+                Dashboard
+              </h1>
+              <p className="text-sm opacity-80 font-medium">
+                ContactKaro Management System
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => router.push("/dashboard/tags")}
+                className="rounded-lg bg-black text-white px-4 py-2 text-sm font-semibold hover:bg-gray-800 transition"
+              >
+                Tags
+              </button>
+              <button
+                onClick={() => router.push("/dashboard/employees")}
+                className="rounded-lg bg-black text-white px-4 py-2 text-sm font-semibold hover:bg-gray-800 transition"
+              >
+                Employees
+              </button>
               <button
                 onClick={handleLogout}
-                className="rounded-lg border border-slate-900 px-3 py-1 text-sm font-semibold text-slate-900 hover:bg-slate-900 hover:text-white"
+                className="rounded-lg border-2 border-black text-black px-4 py-2 text-sm font-semibold hover:bg-black hover:text-white transition"
               >
                 Logout
               </button>
             </div>
           </div>
-          <p className="text-sm text-slate-600">
-            Quick form to add a batch with name, notes, and quantity.
-          </p>
         </div>
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-xl">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">Add Batch</h2>
-            <p className="text-sm text-slate-600">
-              Provide the batch name (batch_id), notes, and quantity.
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+              Create New Batch
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Generate QR codes in bulk for distribution
             </p>
           </div>
         </div>
 
-        <form className="mt-6 grid gap-5 sm:grid-cols-2" onSubmit={handleSubmit}>
-          <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
-            Name
+        <form
+          className="mt-6 grid gap-5 sm:grid-cols-2"
+          onSubmit={handleSubmit}
+        >
+          <label className="flex flex-col gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            Batch Name
             <input
               name="name"
               placeholder="BATCH001"
-              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none focus:border-slate-400"
+              className="rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400"
               type="text"
               value={formState.name}
               onChange={handleChange}
             />
           </label>
 
-          <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
+          <label className="flex flex-col gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             Quantity
             <input
               name="qty"
               placeholder="100"
-              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none focus:border-slate-400"
+              className="rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400"
               type="number"
               min={1}
               value={formState.qty}
@@ -181,19 +212,21 @@ export default function DashboardPage() {
             />
           </label>
 
-          <label className="flex flex-col gap-2 text-sm font-medium text-slate-700 sm:col-span-2">
-            Notes
+          <label className="flex flex-col gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 sm:col-span-2">
+            Notes (Optional)
             <textarea
               name="notes"
-              placeholder="Optional notes"
-              className="min-h-[96px] rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none focus:border-slate-400"
+              placeholder="Additional notes..."
+              className="min-h-[96px] rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400"
               value={formState.notes}
               onChange={handleChange}
             />
           </label>
 
           {errorMessage ? (
-            <p className="text-sm font-medium text-red-600 sm:col-span-2">{errorMessage}</p>
+            <p className="text-sm font-medium text-red-600 sm:col-span-2">
+              {errorMessage}
+            </p>
           ) : null}
           {successMessage ? (
             <p className="text-sm font-medium text-emerald-600 sm:col-span-2">
@@ -204,48 +237,58 @@ export default function DashboardPage() {
           <div className="flex items-center justify-end sm:col-span-2">
             <button
               type="submit"
-              className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-lg bg-yellow-400 text-black hover:bg-yellow-500 px-6 py-3 text-base font-bold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!canSubmit || isSubmitting}
             >
-              {isSubmitting ? "Adding..." : "Add batch"}
+              {isSubmitting ? "⏳ Creating..." : "Create Batch →"}
             </button>
           </div>
         </form>
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-xl">
         <div className="flex flex-col gap-2">
-          <h2 className="text-lg font-semibold text-slate-900">Recent Batches</h2>
-          <p className="text-sm text-slate-600">
-            Download the QR zip for each batch when ready.
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            Recent Batches
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Download QR codes when batch generation is complete
           </p>
         </div>
 
         <div className="mt-6 space-y-3">
           {isLoading ? (
-            <p className="text-sm text-slate-500">Loading batches...</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Loading batches...
+            </p>
           ) : batches.length === 0 ? (
-            <p className="text-sm text-slate-500">No batches found yet.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              No batches created yet.
+            </p>
           ) : (
             batches.map((batch) => (
               <div
                 key={batch._id}
-                className="flex flex-col gap-3 rounded-lg border border-slate-200 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 sm:flex-row sm:items-center sm:justify-between hover:border-yellow-400 transition"
               >
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">{batch.batch_id}</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-sm font-bold text-gray-900 dark:text-white">
+                    {batch.batch_id}
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
                     Qty: {batch.qty} {batch.status ? `• ${batch.status}` : ""}
                   </p>
-                  {batch.note ? (
-                    <p className="mt-1 text-xs text-slate-600">{batch.note}</p>
-                  ) : null}
+                  {batch.note && (
+                    <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                      {batch.note}
+                    </p>
+                  )}
                 </div>
                 <a
                   href={`/api/v0/batch/download/${batch._id}`}
-                  className="inline-flex items-center justify-center rounded-lg border border-slate-900 px-3 py-2 text-xs font-semibold text-slate-900 transition hover:bg-slate-900 hover:text-white"
+                  className="inline-flex items-center justify-center rounded-lg bg-yellow-400 text-black hover:bg-yellow-500 px-4 py-2 text-sm font-bold transition shadow-md hover:shadow-lg"
                 >
-                  Download QR zip
+                  📥 Download ZIP
                 </a>
               </div>
             ))
