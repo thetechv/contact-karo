@@ -1,11 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { Form, Field } from "formik";
+import {
+  EnhancedForm,
+  FormFieldWrapper,
+  FormikSubmitButton,
+  vehicleRegistrationSchema,
+  type VehicleRegistrationFormData,
+  type ApiResponse,
+} from "@/fe/lib/validation";
 import { registerFormFields } from "../constants";
 import { ownerModalStyles } from "../styles/ownerModalStyles";
-import { FormInput } from "./FormInput";
-import { FormTextarea } from "./FormTextarea";
-import { FormSelect } from "./FormSelect";
 import { ModalHeader } from "./ModalHeader";
 import tagService from "@/fe/services/tagService";
 
@@ -15,6 +21,18 @@ interface RegisterModalProps {
   tagId: string;
   onSuccess?: () => void;
 }
+
+const initialValues: VehicleRegistrationFormData = {
+  name: "",
+  phone: "",
+  whatsapp: "",
+  email: "",
+  vehicle_no: "",
+  vehicle_type: "",
+  emergency_contact_1: "",
+  emergency_contact_2: "",
+  address: "",
+};
 
 type Step = "form" | "otp";
 
@@ -141,9 +159,9 @@ export function RegisterModal({
           onClose();
           onSuccess?.();
           // Reset form
-            setStep("form");
-            setOtp("");
-            setFormData(initialFormData);
+          setStep("form");
+          setOtp("");
+          setFormData(initialFormData);
         }, 2000);
       } else {
         setError(response.message || "Failed to register vehicle");

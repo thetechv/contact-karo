@@ -6,29 +6,24 @@ import { BatchForm } from "./BatchForm";
 import { BatchList } from "./BatchList";
 import { EmployeesContainer } from "../modules/employees/components/EmployeesContainer";
 import { TagsContainer } from "../modules/tags/components/TagsContainer";
-import {
-  useBatches,
-  useBatchForm,
-  useAuthCheck,
-  useDashboardModule,
-} from "../hooks";
+import { useBatches, useAuthCheck, useDashboardModule } from "../hooks";
+import BatchService from "@/fe/services/batchService";
+import { BatchFormData, ApiResponse } from "@/fe/lib/validation";
 
 export const DashboardContainer = () => {
-  const { batches, isLoading, errorMessage, loadBatches, setErrorMessage } =
-    useBatches();
-  const {
-    formState,
-    isSubmitting,
-    errorMessage: formErrorMessage,
-    successMessage,
-    canSubmit,
-    handleChange,
-    handleSubmit,
-    setErrorMessage: setFormErrorMessage,
-    setSuccessMessage,
-  } = useBatchForm(loadBatches);
+  const { batches, isLoading, errorMessage, loadBatches } = useBatches();
   const { handleLogout, router } = useAuthCheck(loadBatches);
   const { activeModule, setActiveModule } = useDashboardModule();
+
+  const handleBatchSubmit = async (
+    data: BatchFormData,
+  ): Promise<ApiResponse> => {
+    return BatchService.createBatch(data);
+  };
+
+  const handleBatchSuccess = async () => {
+    await loadBatches();
+  };
 
   const renderModuleContent = () => {
     switch (activeModule) {
@@ -36,13 +31,8 @@ export const DashboardContainer = () => {
         return (
           <div className="flex flex-col gap-8">
             <BatchForm
-              formState={formState}
-              isSubmitting={isSubmitting}
-              errorMessage={formErrorMessage}
-              successMessage={successMessage}
-              canSubmit={canSubmit}
-              handleChange={handleChange}
-              handleSubmit={handleSubmit}
+              onSubmit={handleBatchSubmit}
+              onSuccess={handleBatchSuccess}
             />
             <BatchList batches={batches} isLoading={isLoading} />
           </div>

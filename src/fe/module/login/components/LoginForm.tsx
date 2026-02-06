@@ -1,22 +1,24 @@
+import { Form, Field } from "formik";
+import {
+  EnhancedForm,
+  FormFieldWrapper,
+  FormikSubmitButton,
+  loginFormSchema,
+  type LoginFormData,
+  type ApiResponse,
+} from "@/fe/lib/validation";
+
+const initialValues: LoginFormData = {
+  email: "",
+  password: "",
+};
+
 interface LoginFormProps {
-  email: string;
-  password: string;
-  isSubmitting: boolean;
-  error: string;
-  onEmailChange: (email: string) => void;
-  onPasswordChange: (password: string) => void;
-  onSubmit: (e: React.FormEvent) => Promise<void>;
+  onSubmit: (data: LoginFormData) => Promise<ApiResponse>;
+  onSuccess?: () => void;
 }
 
-export const LoginForm = ({
-  email,
-  password,
-  isSubmitting,
-  error,
-  onEmailChange,
-  onPasswordChange,
-  onSubmit,
-}: LoginFormProps) => {
+export const LoginForm = ({ onSubmit, onSuccess }: LoginFormProps) => {
   return (
     <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-8 shadow-xl">
       <div className="mb-8 text-center">
@@ -33,47 +35,60 @@ export const LoginForm = ({
         </p>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-5">
-        <label className="flex flex-col gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-          Email Address
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => onEmailChange(e.target.value)}
-            className="rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400 transition-all"
-            placeholder="employee@contactkaro.in"
-            required
-            autoComplete="email"
-          />
-        </label>
+      <EnhancedForm<LoginFormData>
+        initialValues={initialValues}
+        validationSchema={loginFormSchema}
+        onSubmit={onSubmit}
+        onSuccess={onSuccess}
+        successMessage="Login successful! Redirecting..."
+        showNotifications={true}
+      >
+        {({ values, errors, touched, handleChange, handleBlur, formState }) => (
+          <Form className="space-y-5">
+            <FormFieldWrapper
+              name="email"
+              label="Email Address"
+              required
+              error={errors.email}
+              touched={touched.email}
+            >
+              <Field
+                name="email"
+                type="email"
+                placeholder="employee@contactkaro.in"
+                autoComplete="email"
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all"
+                disabled={formState.isSubmitting}
+              />
+            </FormFieldWrapper>
 
-        <label className="flex flex-col gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => onPasswordChange(e.target.value)}
-            className="rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400 transition-all"
-            placeholder="••••••••"
-            required
-            autoComplete="current-password"
-          />
-        </label>
+            <FormFieldWrapper
+              name="password"
+              label="Password"
+              required
+              error={errors.password}
+              touched={touched.password}
+            >
+              <Field
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                autoComplete="current-password"
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all"
+                disabled={formState.isSubmitting}
+              />
+            </FormFieldWrapper>
 
-        {error && (
-          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 rounded-lg text-sm">
-            {error}
-          </div>
+            <FormikSubmitButton
+              isSubmitting={formState.isSubmitting}
+              loadingText="⏳ Signing in..."
+              className="w-full rounded-lg bg-yellow-400 hover:bg-yellow-500 px-4 py-3 text-base font-bold text-black shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Sign In →
+            </FormikSubmitButton>
+          </Form>
         )}
-
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full rounded-lg bg-yellow-400 hover:bg-yellow-500 px-4 py-3 text-base font-bold text-black shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? "⏳ Signing in..." : "Sign In →"}
-        </button>
-      </form>
+      </EnhancedForm>
 
       <p className="mt-6 text-center text-xs text-gray-500 dark:text-gray-400">
         © 2026 ContactKaro. All rights reserved.
