@@ -143,7 +143,7 @@ export default function DashboardPage() {
               <h1 className="text-3xl font-extrabold text-black tracking-tight">
                 Dashboard
               </h1>
-              <p className="text-sm opacity-80 font-medium">
+              <p className="text-sm opacity-80 font-bold text-black">
                 ContactKaro Management System
               </p>
             </div>

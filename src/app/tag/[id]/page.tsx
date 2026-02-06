@@ -8,7 +8,7 @@ import {
   ActionButtons,
   MessageModal,
   OwnerLoginSection,
-  OwnerLoginModal,
+  OwnerLoginFlow,
   EmptyState,
   RegisterModal,
 } from "@/fe/module/home/components";
@@ -120,9 +120,10 @@ export default function HomePage() {
             reasonOptions={reasonOptions}
           />
 
-          <OwnerLoginModal
+          <OwnerLoginFlow
             isOpen={isOwnerLoginModalOpen}
             onClose={() => setIsOwnerLoginModalOpen(false)}
+            tagId={id}
             onSubmit={handleOwnerFormSubmit}
           />
         </>

@@ -12,20 +12,26 @@ interface OwnerLoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: OwnerFormData) => void;
+  initialData?: OwnerFormData;
 }
 
 export function OwnerLoginModal({
   isOpen,
   onClose,
   onSubmit,
+  initialData,
 }: OwnerLoginModalProps) {
-  const { formData, handleChange, handleSubmit } = useOwnerForm(onSubmit);
+  const { formData, handleChange, handleSubmit } = useOwnerForm(
+    onSubmit,
+    initialData,
+  );
 
   if (!isOpen) return null;
 
   const renderField = (field: (typeof ownerFormFields)[0]) => {
-    const fieldElement =
-      field.type === "textarea" ? (
+    let fieldElement: React.ReactNode;
+    if (field.type === "textarea") {
+      fieldElement = (
         <FormTextarea
           name={field.name}
           label={field.label}
@@ -35,7 +41,22 @@ export function OwnerLoginModal({
           rows={field.rows || 3}
           onChange={handleChange}
         />
-      ) : (
+      );
+    } else if (field.type === "select") {
+      const { FormSelect } = require("./FormSelect");
+      fieldElement = (
+        <FormSelect
+          name={field.name}
+          label={field.label}
+          value={formData[field.name as keyof OwnerFormData] as string}
+          required={field.required}
+          placeholder={field.placeholder}
+          options={field.options || []}
+          onChange={handleChange as any}
+        />
+      );
+    } else {
+      fieldElement = (
         <FormInput
           name={field.name}
           label={field.label}
@@ -46,6 +67,7 @@ export function OwnerLoginModal({
           onChange={handleChange}
         />
       );
+    }
 
     // Full-width fields
     const isFullWidth = ["address", "email"].includes(field.name);

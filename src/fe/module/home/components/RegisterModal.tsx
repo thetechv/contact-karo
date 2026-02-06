@@ -16,7 +16,7 @@ interface RegisterModalProps {
   onSuccess?: () => void;
 }
 
-type Step = "phone" | "otp" | "form";
+type Step = "form" | "otp";
 
 const initialFormData = {
   name: "",
@@ -36,8 +36,7 @@ export function RegisterModal({
   tagId,
   onSuccess,
 }: RegisterModalProps) {
-  const [step, setStep] = useState<Step>("phone");
-  const [phone, setPhone] = useState("");
+  const [step, setStep] = useState<Step>("form");
   const [otp, setOtp] = useState("");
   const [formData, setFormData] = useState(initialFormData);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +53,8 @@ export function RegisterModal({
 
   const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (phone.length !== 10) {
+    const phoneNumber = (formData.phone || "").replace(/\D/g, "").slice(0, 10);
+    if (phoneNumber.length !== 10) {
       setError("Enter valid 10-digit phone number");
       return;
     }
@@ -63,11 +63,11 @@ export function RegisterModal({
     setError(null);
 
     try {
-      const response = await tagService.generateOtp(tagId, phone);
+      const response = await tagService.generateOtp(tagId, phoneNumber);
       if (response.success) {
         setStep("otp");
         setOtpTimer(120); // 2 minutes
-        setFormData({ ...formData, phone });
+        setFormData({ ...formData, phone: phoneNumber });
       } else {
         setError(response.message || "Failed to send OTP");
       }
@@ -78,14 +78,40 @@ export function RegisterModal({
     }
   };
 
-  const handleVerifyOtpAndContinue = (e: React.FormEvent) => {
+  const handleVerifyOtpAndContinue = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.length !== 6) {
       setError("Enter 6-digit OTP");
       return;
     }
+    setIsSubmitting(true);
     setError(null);
-    setStep("form");
+
+    try {
+      const response = await tagService.activateTag(tagId, {
+        otp,
+        ...formData,
+      });
+
+      if (response.success) {
+        setSuccessMessage("Vehicle registered successfully!");
+        setTimeout(() => {
+          setSuccessMessage(null);
+          onClose();
+          onSuccess?.();
+          // Reset form
+          setStep("form");
+          setOtp("");
+          setFormData(initialFormData);
+        }, 2000);
+      } else {
+        setError(response.message || "Failed to register vehicle");
+      }
+    } catch (err: any) {
+      setError(err?.message || "An error occurred while registering");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (
@@ -115,10 +141,9 @@ export function RegisterModal({
           onClose();
           onSuccess?.();
           // Reset form
-          setStep("phone");
-          setPhone("");
-          setOtp("");
-          setFormData(initialFormData);
+            setStep("form");
+            setOtp("");
+            setFormData(initialFormData);
         }, 2000);
       } else {
         setError(response.message || "Failed to register vehicle");
@@ -186,7 +211,7 @@ export function RegisterModal({
       <div className={ownerModalStyles.modal}>
         <ModalHeader
           title={
-            step === "phone"
+            step === "form"
               ? "Register Vehicle"
               : step === "otp"
                 ? "Verify OTP"
@@ -214,29 +239,36 @@ export function RegisterModal({
             </div>
           )}
 
-          {step === "phone" && (
-            <form onSubmit={handleRequestOtp} className="p-6 space-y-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                Enter your phone number to receive OTP for registration
-              </p>
-              <FormInput
-                name="phone"
-                label="Phone Number"
-                type="tel"
-                value={phone}
-                onChange={(e) =>
-                  setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
-                }
-                placeholder="10-digit phone number"
-                required
-              />
-              <button
-                type="submit"
-                className={ownerModalStyles.form.submitButton}
-                disabled={isSubmitting || phone.length !== 10}
-              >
-                {isSubmitting ? "⏳ Sending..." : "Send OTP 📱"}
-              </button>
+          {step === "form" && (
+            <form
+              noValidate
+              onSubmit={handleRequestOtp}
+              className={ownerModalStyles.form.container}
+            >
+              <div className={ownerModalStyles.form.grid}>
+                {registerFormFields.map(renderField)}
+              </div>
+
+              <div className="flex gap-3 p-6">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex-1 px-6 py-3 rounded-full border-2 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold transition-all"
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-yellow-400 text-black hover:bg-yellow-500 px-6 py-3 rounded-full font-semibold transition-all shadow-lg hover:shadow-xl disabled:opacity-50"
+                  disabled={
+                    isSubmitting ||
+                    (formData.phone || "").replace(/\D/g, "").length !== 10
+                  }
+                >
+                  {isSubmitting ? "⏳ Sending..." : "Next ➜"}
+                </button>
+              </div>
             </form>
           )}
 
@@ -246,7 +278,7 @@ export function RegisterModal({
               className="p-6 space-y-4"
             >
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 text-center">
-                Enter 6-digit OTP sent to {phone}
+                Enter 6-digit OTP sent to {formData.phone}
               </p>
               <div className="flex gap-2 justify-center mb-4">
                 {[...Array(6)].map((_, i) => (
@@ -287,7 +319,7 @@ export function RegisterModal({
               <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() => setStep("phone")}
+                  onClick={() => setStep("form")}
                   className="flex-1 px-6 py-3 rounded-full border-2 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold transition-all"
                 >
                   Back
@@ -303,37 +335,7 @@ export function RegisterModal({
             </form>
           )}
 
-          {step === "form" && (
-            <form
-              onSubmit={handleSubmit}
-              className={ownerModalStyles.form.container}
-            >
-              <div className={ownerModalStyles.form.grid}>
-                {/* Hide phone field as it's already captured */}
-                {registerFormFields
-                  .filter((f) => f.name !== "phone")
-                  .map(renderField)}
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setStep("otp")}
-                  className="flex-1 px-6 py-3 rounded-full border-2 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold transition-all"
-                  disabled={isSubmitting}
-                >
-                  Back
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 bg-yellow-400 text-black hover:bg-yellow-500 px-6 py-3 rounded-full font-semibold transition-all shadow-lg hover:shadow-xl disabled:opacity-50"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "⏳ Registering..." : "Register Vehicle 🚀"}
-                </button>
-              </div>
-            </form>
-          )}
+          {/* previously the vehicle details form was here; it's now the first step */}
         </div>
       </div>
     </div>
