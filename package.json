@@ -12,6 +12,7 @@
     "archiver": "^7.0.1",
     "bcryptjs": "^3.0.3",
     "cookie": "^1.1.1",
+    "formik": "^2.4.9",
     "inrext-framework": "^1.0.0",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.563.0",
@@ -21,7 +22,8 @@
     "qrcode": "^1.5.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "twilio": "^5.12.0"
+    "twilio": "^5.12.0",
+    "yup": "^1.7.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

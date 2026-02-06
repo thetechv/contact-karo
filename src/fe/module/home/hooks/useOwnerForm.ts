@@ -5,6 +5,8 @@ export interface OwnerFormData {
   phone: string;
   whatsapp: string;
   email: string;
+  vehicle_no: string;
+  vehicle_type: string;
   emergency_contact_1: string;
   emergency_contact_2: string;
   address: string;
@@ -15,13 +17,20 @@ const initialFormState: OwnerFormData = {
   phone: "",
   whatsapp: "",
   email: "",
+  vehicle_no: "",
+  vehicle_type: "",
   emergency_contact_1: "",
   emergency_contact_2: "",
   address: "",
 };
 
-export function useOwnerForm(onSubmit: (data: OwnerFormData) => void) {
-  const [formData, setFormData] = useState<OwnerFormData>(initialFormState);
+export function useOwnerForm(
+  onSubmit: (data: OwnerFormData) => void,
+  initialData?: OwnerFormData,
+) {
+  const [formData, setFormData] = useState<OwnerFormData>(
+    initialData || initialFormState,
+  );
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,

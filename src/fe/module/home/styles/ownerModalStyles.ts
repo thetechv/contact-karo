@@ -2,7 +2,7 @@ export const ownerModalStyles = {
   overlay: "fixed inset-0 z-50 flex items-center justify-center p-4",
   backdrop: "absolute inset-0 bg-black/70 backdrop-blur-sm",
   modal:
-    "relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col border-2 border-gray-900 dark:border-gray-300",
+    "relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col border-2 border-gray-900 dark:border-gray-300",
   header: {
     container:
       "bg-white dark:bg-gray-900 border-b-2 border-gray-900 dark:border-gray-300 px-6 py-4 flex-shrink-0",
