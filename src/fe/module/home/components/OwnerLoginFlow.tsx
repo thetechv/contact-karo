@@ -6,7 +6,7 @@ import { OtpInput } from "@/fe/components/ui/OtpInput";
 import tagService from "@/fe/services/tagService";
 import { ownerModalStyles } from "../styles/ownerModalStyles";
 import { OwnerLoginModal } from "./OwnerLoginModal";
-import type { OwnerFormData } from "../hooks/useOwnerForm";
+import type { OwnerFormData } from "@/fe/services/home";
 
 interface Props {
   isOpen: boolean;

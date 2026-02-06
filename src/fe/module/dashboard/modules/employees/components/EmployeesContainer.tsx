@@ -4,8 +4,11 @@ import { LoadingSpinner } from "@/fe/components/ui";
 import { EmployeesHeader } from "./EmployeesHeader";
 import { EmployeesTable } from "./EmployeesTable";
 import { AddEmployeeModal } from "./AddEmployeeModal";
-import { useEmployees, useEmployeeForm } from "../hooks";
-import { useSharedAuthCheck } from "../../../hooks";
+import {
+  useEmployees,
+  useEmployeeForm,
+} from "@/fe/services/dashboard/employees";
+import { useSharedAuthCheck } from "@/fe/services/auth";
 
 export const EmployeesContainer = () => {
   const { employees, loading, error, loadEmployees } = useEmployees();

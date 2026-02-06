@@ -6,7 +6,8 @@ import { BatchForm } from "./BatchForm";
 import { BatchList } from "./BatchList";
 import { EmployeesContainer } from "../modules/employees/components/EmployeesContainer";
 import { TagsContainer } from "../modules/tags/components/TagsContainer";
-import { useBatches, useAuthCheck, useDashboardModule } from "../hooks";
+import { useBatches, useDashboardModule } from "@/fe/services/dashboard";
+import { useAuthCheck } from "@/fe/services/auth";
 import BatchService from "@/fe/services/batchService";
 import { BatchFormData, ApiResponse } from "@/fe/lib/validation";
 

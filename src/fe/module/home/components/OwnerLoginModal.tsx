@@ -162,7 +162,6 @@ export function OwnerLoginModal({
           <div className="px-6 py-6">
             <EnhancedForm<OwnerFormData>
               initialValues={initialValues}
-              enableReinitialize={true}
               validationSchema={ownerFormSchema}
               onSubmit={handleOwnerSubmit}
               successMessage="Owner information submitted successfully!"

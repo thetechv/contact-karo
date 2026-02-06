@@ -11,7 +11,7 @@ import {
   EmptyState,
   RegisterModal,
 } from "@/fe/module/home/components";
-import { reasonOptions } from "@/fe/module/home/constants";
+import { reasonOptions } from "@/fe/services/constants";
 import {
   useVehicleOwner,
   useVehicleActions,
@@ -20,7 +20,7 @@ import {
   useReasonSelector,
   useRegistration,
   useTagId,
-} from "@/fe/module/home/hooks";
+} from "@/fe/services/home";
 import { pageStyles } from "@/fe/module/home/styles/pageStyles";
 
 export function TagPage() {

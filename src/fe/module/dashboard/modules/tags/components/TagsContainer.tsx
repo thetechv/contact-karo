@@ -5,8 +5,8 @@ import { TagsHeader } from "./TagsHeader";
 import { TagsStats } from "./TagsStats";
 import { TagsFilters } from "./TagsFilters";
 import { TagsTable } from "./TagsTable";
-import { useTags, useTagFilters } from "../hooks";
-import { useSharedAuthCheck } from "../../../hooks";
+import { useTags, useTagFilters } from "@/fe/services/dashboard/tags";
+import { useSharedAuthCheck } from "@/fe/services/auth";
 
 export const TagsContainer = () => {
   const { tags, loading, error, loadTags } = useTags();
