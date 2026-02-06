@@ -4,11 +4,12 @@ import { LoadingSpinner } from "@/fe/components/ui";
 import { EmployeesHeader } from "./EmployeesHeader";
 import { EmployeesTable } from "./EmployeesTable";
 import { AddEmployeeModal } from "./AddEmployeeModal";
-import { useEmployees, useEmployeeForm, useAuthCheck } from "../hooks";
+import { useEmployees, useEmployeeForm } from "../hooks";
+import { useSharedAuthCheck } from "../../../hooks";
 
 export const EmployeesContainer = () => {
   const { employees, loading, error, loadEmployees } = useEmployees();
-  const { router } = useAuthCheck(loadEmployees);
+  const { router } = useSharedAuthCheck({ loadData: loadEmployees });
   const {
     formData,
     formErrors,

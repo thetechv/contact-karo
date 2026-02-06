@@ -5,11 +5,12 @@ import { TagsHeader } from "./TagsHeader";
 import { TagsStats } from "./TagsStats";
 import { TagsFilters } from "./TagsFilters";
 import { TagsTable } from "./TagsTable";
-import { useTags, useTagFilters, useAuthCheck } from "../hooks";
+import { useTags, useTagFilters } from "../hooks";
+import { useSharedAuthCheck } from "../../../hooks";
 
 export const TagsContainer = () => {
   const { tags, loading, error, loadTags } = useTags();
-  const { router } = useAuthCheck(loadTags);
+  const { router } = useSharedAuthCheck({ loadData: loadTags });
   const { filter, filteredTags, stats, updateFilter } = useTagFilters(tags);
 
   if (loading) {

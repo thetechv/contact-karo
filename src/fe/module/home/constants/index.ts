@@ -1,10 +1,21 @@
-export * from "./mockData";
 export * from "./formFields";
 
 export interface ReasonOption {
   id: string;
   icon: string;
   label: string;
+}
+
+export interface VehicleOwner {
+  name: string;
+  phone: string;
+  whatsapp: string;
+  email: string;
+  vehicle_no: string;
+  vehicle_type: string;
+  emergency_contact_1: string;
+  emergency_contact_2: string;
+  address: string;
 }
 
 export const reasonOptions: ReasonOption[] = [

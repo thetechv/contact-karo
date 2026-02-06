@@ -11,3 +11,4 @@ export { FormTextarea } from "./FormTextarea";
 export { FormSelect } from "./FormSelect";
 export { ModalHeader } from "./ModalHeader";
 export { EmptyState } from "./EmptyState";
+export { TagPage } from "./TagPage";
