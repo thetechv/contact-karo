@@ -1,7 +1,7 @@
-import { PrivateController } from "../../../../be/framework/privateController";
+import { PrivateEmployeeController } from "../../../../be/framework/privateEmployeeController";
 import EmployeeService from "../../../../be/services/EmployeeService";
 
-class EmployeeController extends PrivateController {
+class EmployeeController extends PrivateEmployeeController {
   constructor() {
     super();
     this.service = new EmployeeService();

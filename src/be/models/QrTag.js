@@ -12,6 +12,13 @@ const QrTagSchema = new Schema(
     user_id: { type: Types.ObjectId, ref: "User", unique: true, sparse: true, index: true },
 
     status: { type: String, enum: ["unassigned", "active", "disabled"], default: "unassigned" },
+    otp: {
+      code: { type: String, required: false },
+      expires_at: { type: Date, required: false },
+      attempts: { type: Number, default: 0 },
+      last_attempt_at: { type: Date, required: false },
+      phone: { type: String, required: false },
+    },
     isActive: { type: Boolean, default: false },
   },
   { timestamps: true }
