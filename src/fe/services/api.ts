@@ -93,8 +93,9 @@ class ApiService {
   }
 
   async updateTag(tagId: string, data: any) {
-    return this.request<any>(`/tag/${tagId}`, {
-      method: "PATCH",
+    // Use the authenticated update endpoint which expects a POST to /tag/:id/updateTag
+    return this.request<any>(`/tag/${tagId}/updateTag`, {
+      method: "POST",
       body: JSON.stringify(data),
     });
   }

@@ -5,6 +5,7 @@ class ApiService {
   async get(path) {
     const response = await fetch(`${this.BASE_URL}/${path}`, {
       method: "GET",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
@@ -25,6 +26,7 @@ class ApiService {
   async post(path, body) {
     const response = await fetch(`${this.BASE_URL}/${path}`, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },

@@ -33,7 +33,8 @@ class TagService extends ApiService {
   }
 
   async updateTag(tagId, userData) {
-    const data = await this.patch(`tag/${tagId}`, userData);
+    // Use the authenticated update endpoint implemented on the server
+    const data = await this.post(`tag/${tagId}/updateTag`, userData);
     return data;
   }
 

@@ -12,6 +12,7 @@ import {
   EmptyState,
   RegisterModal,
 } from "@/fe/module/home/components";
+import { api } from "@/fe/services/api";
 import { reasonOptions, type VehicleOwner } from "@/fe/module/home/constants";
 import {
   useVehicleOwner,
@@ -51,10 +52,22 @@ export default function HomePage() {
     setIsOwnerLoginModalOpen(true);
   };
 
-  const handleOwnerFormSubmit = (data: OwnerFormData) => {
-    console.log("Owner details submitted:", data);
-    // TODO: Send data to API
-    setIsOwnerLoginModalOpen(false);
+  const handleOwnerFormSubmit = async (data: OwnerFormData) => {
+    try {
+      console.log("Owner details submitted:", data);
+      const response = await api.updateTag(id, data);
+      if (response?.success) {
+        // Refresh page to show updated owner data
+        window.location.reload();
+      } else {
+        // show error fallback
+        alert(response?.message || "Failed to update owner details");
+      }
+    } catch (err: any) {
+      alert(err?.message || "Failed to update owner details");
+    } finally {
+      setIsOwnerLoginModalOpen(false);
+    }
   };
 
   const handleRegisterClick = () => {

@@ -131,13 +131,6 @@ export const ownerFormFields: FormFieldConfig[] = [
     ],
   },
   {
-    name: "email",
-    label: "Email Address",
-    type: "email",
-    required: true,
-    placeholder: "your.email@example.com",
-  },
-  {
     name: "emergency_contact_1",
     label: "Emergency Contact 1",
     type: "tel",
