@@ -11,7 +11,7 @@ import {
   EmptyState,
   RegisterModal,
 } from "@/fe/module/home/components";
-import { reasonOptions } from "@/fe/services/constants";
+import { reasonOptions, getReasonOptions } from "@/fe/services/constants";
 import {
   useVehicleOwner,
   useVehicleActions,
@@ -28,6 +28,8 @@ export function TagPage() {
   const { selectedReason, setSelectedReason } = useReasonSelector("no-parking");
   const { isLoading, vehicleOwner, error } = useVehicleOwner(id);
 
+  const currentReasonOptions = getReasonOptions(vehicleOwner?.vehicle_type);
+
   const {
     isModalOpen,
     setIsModalOpen,
@@ -38,7 +40,7 @@ export function TagPage() {
   } = useVehicleActions({
     vehicleOwner,
     selectedReason,
-    reasonOptions,
+    reasonOptions: currentReasonOptions,
   });
 
   const {
@@ -69,8 +71,13 @@ export function TagPage() {
   });
 
   const handleOwnerFormSubmit = async (data: any) => {
-    await submitOwnerForm(data);
-    closeOwnerLoginModal();
+    try {
+      await submitOwnerForm(data);
+      closeOwnerLoginModal();
+    } catch (error) {
+      // Error will be handled by the OwnerLoginFlow component
+      throw error;
+    }
   };
 
   return (
@@ -105,7 +112,7 @@ export function TagPage() {
             />
 
             <ReasonSelector
-              options={reasonOptions}
+              options={currentReasonOptions}
               selectedReason={selectedReason}
               onSelect={setSelectedReason}
             />
@@ -124,7 +131,7 @@ export function TagPage() {
             onClose={() => setIsModalOpen(false)}
             selectedReason={selectedReason}
             onSend={handleSendMessage}
-            reasonOptions={reasonOptions}
+            reasonOptions={currentReasonOptions}
           />
 
           <OwnerLoginFlow

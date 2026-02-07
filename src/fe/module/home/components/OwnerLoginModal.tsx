@@ -19,7 +19,7 @@ import { ModalHeader } from "./ModalHeader";
 interface OwnerLoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: OwnerFormData) => void;
+  onSubmit: (data: OwnerFormData) => Promise<void>;
   initialData?: OwnerFormData;
 }
 
@@ -62,7 +62,7 @@ export function OwnerLoginModal({
     data: OwnerFormData,
   ): Promise<ApiResponse> => {
     try {
-      onSubmit(data);
+      await onSubmit(data);
       return {
         success: true,
         message: "Owner information submitted successfully",
@@ -165,13 +165,14 @@ export function OwnerLoginModal({
               validationSchema={ownerFormSchema}
               onSubmit={handleOwnerSubmit}
               successMessage="Owner information submitted successfully!"
-              autoResetOnSuccess={true}
-              onSuccess={onClose}
+              autoResetOnSuccess={false}
             >
               {({ values, errors, touched, formState }) => (
                 <Form className="space-y-4">
                   <div className={ownerModalStyles.form.grid}>
-                    {ownerFormFields.map(renderFormField)}
+                    {ownerFormFields
+                      .filter((f) => f.name !== "vehicle_type")
+                      .map(renderFormField)}
                   </div>
 
                   <FormikSubmitButton
