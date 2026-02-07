@@ -16,6 +16,7 @@ import { FormTextarea } from "./FormTextarea";
 import { FormSelect } from "./FormSelect";
 import { FormInput } from "./FormInput";
 import { ModalHeader } from "./ModalHeader";
+import { OtpInput } from "@/fe/components/ui/OtpInput";
 import tagService from "@/fe/services/tagService";
 
 interface RegisterModalProps {
@@ -243,19 +244,19 @@ export function RegisterModal({
 
         <div className="flex-1 overflow-y-auto">
           {error && (
-            <div className="mx-6 mt-6 mb-0 p-4 bg-red-50 dark:bg-red-900/20 border border-red-600 dark:border-red-500 text-red-700 dark:text-red-400 rounded-xl">
+            <div className={ownerModalStyles.alert.error}>
               <div className="flex items-center gap-3">
-                <span className="text-2xl shrink-0">⚠️</span>
-                <span className="font-semibold">{error}</span>
+                <span className="text-lg">⚠️</span>
+                <span className="font-medium">{error}</span>
               </div>
             </div>
           )}
 
           {successMessage && (
-            <div className="mx-6 mt-6 mb-0 p-4 bg-green-50 dark:bg-green-900/20 border border-green-600 dark:border-green-500 text-green-700 dark:text-green-400 rounded-xl">
+            <div className={ownerModalStyles.alert.success}>
               <div className="flex items-center gap-3">
-                <span className="text-2xl shrink-0">✓</span>
-                <span className="font-semibold">{successMessage}</span>
+                <span className="text-lg">✅</span>
+                <span className="font-medium">{successMessage}</span>
               </div>
             </div>
           )}
@@ -274,86 +275,154 @@ export function RegisterModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 px-6 py-3 rounded-full border-2 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold transition-all"
+                  className={`flex-1 ${ownerModalStyles.form.secondaryButton}`}
                   disabled={isSubmitting}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-yellow-400 text-black hover:bg-yellow-500 px-6 py-3 rounded-full font-semibold transition-all shadow-lg hover:shadow-xl disabled:opacity-50"
+                  className={`flex-1 ${ownerModalStyles.form.submitButton}`}
                   disabled={
                     isSubmitting ||
                     (formData.phone || "").replace(/\D/g, "").length !== 10
                   }
                 >
-                  {isSubmitting ? "⏳ Sending..." : "Next ➜"}
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <svg
+                        className="w-4 h-4 animate-spin"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Sending...
+                    </span>
+                  ) : (
+                    "Next →"
+                  )}
                 </button>
               </div>
             </form>
           )}
 
           {step === "otp" && (
-            <form
-              onSubmit={handleVerifyOtpAndContinue}
-              className="p-6 space-y-4"
-            >
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 text-center">
-                Enter 6-digit OTP sent to {formData.phone}
-              </p>
-              <div className="flex gap-2 justify-center mb-4">
-                {[...Array(6)].map((_, i) => (
-                  <input
-                    key={i}
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={1}
-                    value={otp[i] || ""}
-                    onChange={(e) => {
-                      const val = e.target.value.replace(/\D/g, "");
-                      const newOtp = otp.split("");
-                      newOtp[i] = val;
-                      setOtp(newOtp.join("").slice(0, 6));
-                      if (val && i < 5) {
-                        const nextInput = e.target
-                          .nextElementSibling as HTMLInputElement;
-                        nextInput?.focus();
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Backspace" && !otp[i] && i > 0) {
-                        const prevInput = (e.target as HTMLInputElement)
-                          .previousElementSibling as HTMLInputElement;
-                        prevInput?.focus();
-                      }
-                    }}
-                    className="w-12 h-14 text-center text-2xl font-bold rounded-lg border-2 border-gray-300 dark:border-gray-700 focus:border-yellow-400 focus:outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                  />
-                ))}
-              </div>
-              {otpTimer > 0 && (
-                <p className="text-sm text-center text-gray-600 dark:text-gray-400">
-                  OTP expires in: {Math.floor(otpTimer / 60)}:
-                  {(otpTimer % 60).toString().padStart(2, "0")}
+            <div className="p-8 space-y-6">
+              {/* Header */}
+              <div className="text-center space-y-2">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Verify OTP
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Enter the 6-digit code sent to{" "}
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    {formData.phone}
+                  </span>
                 </p>
-              )}
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setStep("form")}
-                  className="flex-1 px-6 py-3 rounded-full border-2 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold transition-all"
-                >
-                  Back
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 bg-yellow-400 text-black hover:bg-yellow-500 px-6 py-3 rounded-full font-semibold transition-all"
-                  disabled={otp.length !== 6}
-                >
-                  Continue ➜
-                </button>
               </div>
-            </form>
+
+              <form onSubmit={handleVerifyOtpAndContinue} className="space-y-6">
+                {/* OTP Input */}
+                <div className="space-y-4">
+                  <OtpInput
+                    value={otp}
+                    onChange={setOtp}
+                    length={6}
+                    error={!!error}
+                  />
+
+                  {error && (
+                    <div className={ownerModalStyles.alert.error}>
+                      <p className="text-sm text-center">{error}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Timer */}
+                {otpTimer > 0 && (
+                  <div className="text-center">
+                    <div className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                      <svg
+                        className="w-4 h-4 text-blue-600 dark:text-blue-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                        Expires in {Math.floor(otpTimer / 60)}:
+                        {(otpTimer % 60).toString().padStart(2, "0")}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Buttons */}
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep("form");
+                      setError(null);
+                      setOtp("");
+                    }}
+                    className={`flex-1 ${ownerModalStyles.form.secondaryButton}`}
+                    disabled={isSubmitting}
+                  >
+                    ← Back
+                  </button>
+                  <button
+                    type="submit"
+                    className={`flex-1 ${ownerModalStyles.form.submitButton}`}
+                    disabled={otp.length !== 6 || isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg
+                          className="w-4 h-4 animate-spin"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Verifying...
+                      </span>
+                    ) : (
+                      "Continue →"
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
           )}
 
           {/* previously the vehicle details form was here; it's now the first step */}

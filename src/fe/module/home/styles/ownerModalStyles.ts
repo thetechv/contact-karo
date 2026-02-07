@@ -1,15 +1,14 @@
 export const ownerModalStyles = {
   overlay: "fixed inset-0 z-50 flex items-center justify-center p-4",
-  backdrop: "absolute inset-0 bg-black/70 backdrop-blur-sm",
+  backdrop: "absolute inset-0 bg-black/40",
   modal:
-    "relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col border-2 border-gray-900 dark:border-gray-300",
+    "relative bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden",
   header: {
-    container:
-      "bg-white dark:bg-gray-900 border-b-2 border-gray-900 dark:border-gray-300 px-6 py-4 flex-shrink-0",
+    container: "px-6 py-4 border-b bg-white dark:bg-gray-900",
     wrapper: "flex items-center justify-between",
-    title: "text-xl font-bold text-gray-900 dark:text-white",
+    title: "text-lg font-semibold text-gray-900 dark:text-white",
     closeButton:
-      "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg p-2 transition-all hover:bg-gray-100 dark:hover:bg-gray-800",
+      "text-gray-600 dark:text-gray-400 rounded-md p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition",
     closeIcon: "w-5 h-5",
   },
   form: {
@@ -17,13 +16,21 @@ export const ownerModalStyles = {
     grid: "grid grid-cols-1 md:grid-cols-2 gap-4",
     fullWidth: "md:col-span-2",
     field: "space-y-1.5",
-    label: "block text-sm font-semibold text-gray-900 dark:text-white",
+    label: "block text-sm font-medium text-gray-800 dark:text-gray-200",
     required: "text-red-500 ml-0.5",
     input:
-      "w-full px-4 py-3 text-sm border border-gray-700 dark:border-gray-400 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-500 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 outline-none transition-all",
+      "w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/20 outline-none transition",
     textarea:
-      "w-full px-4 py-3 text-sm border border-gray-700 dark:border-gray-400 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-500 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 outline-none transition-all resize-none",
+      "w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/20 outline-none transition resize-none",
     submitButton:
-      "w-full px-6 py-3.5 bg-yellow-400 hover:bg-yellow-500 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-black font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:cursor-not-allowed disabled:shadow-none transform hover:scale-[1.02] active:scale-[0.98]",
+      "w-full px-5 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-md transition",
+    secondaryButton:
+      "w-full px-5 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-md bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 transition",
+  },
+  alert: {
+    error:
+      "mx-6 mt-6 mb-0 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-md",
+    success:
+      "mx-6 mt-6 mb-0 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 rounded-md",
   },
 } as const;

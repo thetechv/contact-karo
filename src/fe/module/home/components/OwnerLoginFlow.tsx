@@ -99,53 +99,149 @@ export default function OwnerLoginFlow({
 
             <div className={ownerModalStyles.form.container}>
               {step === "phone" && (
-                <div className="space-y-4">
-                  <FormInput
-                    name="phone"
-                    label="Phone"
-                    type="tel"
-                    value={phone}
-                    required
-                    placeholder="Enter phone to receive OTP"
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
-                  {error && <div className="text-red-500">{error}</div>}
-                  <div className="flex gap-2 justify-end">
+                <div className="space-y-6 p-6">
+                  <div className="text-center space-y-2">
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      Enter Phone Number
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      We'll send you a verification code
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <FormInput
+                      name="phone"
+                      label="Phone"
+                      type="tel"
+                      value={phone}
+                      required
+                      placeholder="Enter phone to receive OTP"
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+
+                    {error && (
+                      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                        <p className="text-sm text-red-600 dark:text-red-400 text-center">
+                          {error}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-3">
                     <button
                       onClick={handleCloseAll}
-                      className={ownerModalStyles.form.submitButton}
+                      className="flex-1 px-6 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-500"
+                      disabled={loading}
                     >
                       Cancel
                     </button>
                     <button
                       onClick={sendOtp}
-                      disabled={loading}
-                      className={ownerModalStyles.form.submitButton}
+                      disabled={loading || !phone.trim()}
+                      className="flex-1 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black hover:from-yellow-500 hover:to-yellow-600 px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5"
                     >
-                      {loading ? "Sending..." : "Send OTP"}
+                      {loading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <svg
+                            className="w-4 h-4 animate-spin"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                          Sending...
+                        </span>
+                      ) : (
+                        "Send OTP"
+                      )}
                     </button>
                   </div>
                 </div>
               )}
 
               {step === "otp" && (
-                <div className="space-y-4">
-                  <p className="text-sm">Enter the OTP sent to {phone}</p>
-                  <OtpInput value={otp} onChange={setOtp} />
-                  {error && <div className="text-red-500">{error}</div>}
-                  <div className="flex gap-2 justify-end">
+                <div className="space-y-6">
+                  <div className="text-center space-y-2">
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      Verify OTP
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Enter the 6-digit code sent to{" "}
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        {phone}
+                      </span>
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <OtpInput value={otp} onChange={setOtp} error={!!error} />
+
+                    {error && (
+                      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                        <p className="text-sm text-red-600 dark:text-red-400 text-center">
+                          {error}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-3">
                     <button
-                      onClick={() => setStep("phone")}
-                      className={ownerModalStyles.form.submitButton}
+                      onClick={() => {
+                        setStep("phone");
+                        setError(null);
+                        setOtp("");
+                      }}
+                      className="flex-1 px-6 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-500"
+                      disabled={loading}
                     >
-                      Back
+                      ← Back
                     </button>
                     <button
                       onClick={verify}
-                      disabled={loading}
-                      className={ownerModalStyles.form.submitButton}
+                      disabled={loading || otp.length !== 6}
+                      className="flex-1 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black hover:from-yellow-500 hover:to-yellow-600 px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5"
                     >
-                      {loading ? "Verifying..." : "Verify OTP"}
+                      {loading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <svg
+                            className="w-4 h-4 animate-spin"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                          Verifying...
+                        </span>
+                      ) : (
+                        "Verify OTP"
+                      )}
                     </button>
                   </div>
                 </div>
