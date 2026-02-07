@@ -27,20 +27,27 @@ export const VehicleInfo: React.FC<VehicleInfoProps> = ({
         return "🏍️";
       case "scooter":
         return "🛵";
+      case "bag-tag":
+        return "🎒";
+      case "door-tag":
+        return "🚪";
+      case "business-card":
+        return "📇";
       default:
         return "🚗";
     }
   };
 
+  const getDisplayType = () => {
+    if (!vehicleType) return "Vehicle";
+    return vehicleType
+      .replace(/-/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  };
+
   return (
     <div className={s.container}>
-      <h1 className={s.title}>
-        Contact{" "}
-        {vehicleType
-          ? vehicleType.charAt(0).toUpperCase() + vehicleType.slice(1)
-          : "Vehicle"}{" "}
-        Owner
-      </h1>
+      <h1 className={s.title}>Contact {getDisplayType()} Owner</h1>
 
       <div className={s.plateContainer}>
         <div className={s.plateWrapper}>
