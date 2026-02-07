@@ -171,7 +171,9 @@ export function OwnerLoginModal({
               {({ values, errors, touched, formState }) => (
                 <Form className="space-y-4">
                   <div className={ownerModalStyles.form.grid}>
-                    {ownerFormFields.map(renderFormField)}
+                    {ownerFormFields
+                      .filter((f) => f.name !== "vehicle_type")
+                      .map(renderFormField)}
                   </div>
 
                   <FormikSubmitButton

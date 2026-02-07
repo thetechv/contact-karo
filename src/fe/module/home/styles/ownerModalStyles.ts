@@ -23,9 +23,15 @@ export const ownerModalStyles = {
     textarea:
       "w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/20 outline-none transition resize-none",
     submitButton:
-      "w-full px-5 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-md transition",
+      "w-full px-6 py-4 sm:py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold text-base sm:text-sm rounded-xl shadow-lg hover:shadow-xl disabled:shadow-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:hover:scale-100",
     secondaryButton:
-      "w-full px-5 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-md bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 transition",
+      "w-full px-6 py-4 sm:py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold text-base sm:text-sm rounded-xl bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]",
+
+    // Compact variants for footer buttons (less bulky)
+    submitButtonSmall:
+      "w-full px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold text-sm rounded-md shadow-sm hover:shadow-md transition-all duration-150",
+    secondaryButtonSmall:
+      "w-full px-4 py-2 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-150",
   },
   alert: {
     error:

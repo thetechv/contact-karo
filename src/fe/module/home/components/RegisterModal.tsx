@@ -46,7 +46,7 @@ const initialFormData = {
   whatsapp: "",
   email: "",
   vehicle_no: "",
-  vehicle_type: "car",
+  vehicle_type: "",
   emergency_contact_1: "",
   emergency_contact_2: "",
   address: "",
@@ -268,28 +268,30 @@ export function RegisterModal({
               className={ownerModalStyles.form.container}
             >
               <div className={ownerModalStyles.form.grid}>
-                {registerFormFields.map(renderField)}
+                {registerFormFields
+                  .filter((f) => f.name !== "vehicle_type")
+                  .map(renderField)}
               </div>
 
-              <div className="flex gap-3 p-6">
+              <div className="flex gap-3 pt-1">
                 <button
                   type="button"
                   onClick={onClose}
-                  className={`flex-1 ${ownerModalStyles.form.secondaryButton}`}
+                  className={`flex-1 ${ownerModalStyles.form.secondaryButtonSmall}`}
                   disabled={isSubmitting}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className={`flex-1 ${ownerModalStyles.form.submitButton}`}
+                  className={`flex-1 ${ownerModalStyles.form.submitButtonSmall}`}
                   disabled={
                     isSubmitting ||
                     (formData.phone || "").replace(/\D/g, "").length !== 10
                   }
                 >
                   {isSubmitting ? (
-                    <span className="flex items-center justify-center gap-2">
+                    <span className="flex items-center justify-center gap-2 text-sm">
                       <svg
                         className="w-4 h-4 animate-spin"
                         fill="none"
@@ -312,7 +314,7 @@ export function RegisterModal({
                       Sending...
                     </span>
                   ) : (
-                    "Next →"
+                    <span className="text-sm">Next →</span>
                   )}
                 </button>
               </div>
