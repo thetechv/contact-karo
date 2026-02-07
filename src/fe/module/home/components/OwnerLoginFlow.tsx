@@ -34,7 +34,7 @@ export default function OwnerLoginFlow({
     if (!phone) return setError("Phone is required");
     try {
       setLoading(true);
-      await tagService.generateOtp(tagId, phone);
+      await tagService.generateOtpToUpdateTag(tagId, phone);
       setStep("otp");
     } catch (err: any) {
       setError(err?.message || "Failed to send OTP");
