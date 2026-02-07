@@ -1,6 +1,6 @@
 export const ownerModalStyles = {
   overlay: "fixed inset-0 z-50 flex items-center justify-center p-4",
-  backdrop: "absolute inset-0 bg-black/40",
+  backdrop: "absolute inset-0 bg-black/40 backdrop-blur-sm",
   modal:
     "relative bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden",
   header: {
@@ -23,13 +23,13 @@ export const ownerModalStyles = {
     textarea:
       "w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/20 outline-none transition resize-none",
     submitButton:
-      "w-full px-6 py-4 sm:py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold text-base sm:text-sm rounded-xl shadow-lg hover:shadow-xl disabled:shadow-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:hover:scale-100",
+      "w-full px-5 py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-medium text-base sm:text-sm rounded-md shadow-sm hover:shadow-md disabled:bg-gray-300 disabled:text-gray-600 transition-all duration-150 active:scale-[0.99] disabled:cursor-not-allowed",
     secondaryButton:
-      "w-full px-6 py-4 sm:py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold text-base sm:text-sm rounded-xl bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]",
+      "w-full px-5 py-3 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium text-base sm:text-sm rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-150",
 
     // Compact variants for footer buttons (less bulky)
     submitButtonSmall:
-      "w-full px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold text-sm rounded-md shadow-sm hover:shadow-md transition-all duration-150",
+      "w-full px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-black font-medium text-sm rounded-md shadow-sm hover:shadow-md transition-all duration-150 disabled:bg-gray-300 disabled:text-gray-500",
     secondaryButtonSmall:
       "w-full px-4 py-2 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-150",
   },

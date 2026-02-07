@@ -14,11 +14,11 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    "font-semibold rounded-full transition-all duration-300 inline-flex items-center justify-center";
+    "font-medium rounded-md transition-all duration-300 inline-flex items-center justify-center";
 
   const variants = {
     primary:
-      "bg-yellow-400 text-black hover:bg-yellow-500 shadow-lg hover:shadow-xl",
+      "bg-yellow-400 text-black hover:bg-yellow-500 shadow-sm hover:shadow-md",
     secondary: "bg-gray-800 text-white hover:bg-gray-900",
     outline:
       "border-2 border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white",

@@ -94,7 +94,7 @@ export default function OwnerLoginFlow({
 
           <div className={ownerModalStyles.modal}>
             <div className={ownerModalStyles.header.container}>
-              <div className={ownerModalStyles.header.title}>Owner Login</div>
+              <div className={ownerModalStyles.header.title}>Update Owner Details</div>
             </div>
 
             <div className={ownerModalStyles.form.container}>

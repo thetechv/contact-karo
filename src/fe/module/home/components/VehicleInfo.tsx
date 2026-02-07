@@ -7,7 +7,7 @@ import { vehicleInfoStyles } from "@/fe/module/home/styles/vehicleStyles";
 interface VehicleInfoProps {
   vehicleName: string;
   plateNumber: string;
-  vehicleType: string;
+  vehicleType?: string;
 }
 
 export const VehicleInfo: React.FC<VehicleInfoProps> = ({
@@ -19,7 +19,8 @@ export const VehicleInfo: React.FC<VehicleInfoProps> = ({
 
   // Get appropriate icon based on vehicle type
   const getVehicleIcon = () => {
-    switch (vehicleType.toLowerCase()) {
+    const t = (vehicleType || "").toLowerCase();
+    switch (t) {
       case "car":
         return "🚗";
       case "bike":
