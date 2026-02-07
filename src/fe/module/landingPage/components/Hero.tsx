@@ -67,7 +67,7 @@ export const Hero: React.FC = () => {
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h3 className="text-2xl font-black text-gray-900 dark:text-white tracking-tighter">
-                    ContactKaro<span className="text-yellow-500">.in</span>
+                    contact<span className="text-yellow-500">Karo</span>.in
                   </h3>
                   <p className="text-xs text-gray-400 font-medium tracking-wide">
                     SECURE CAR TAG
