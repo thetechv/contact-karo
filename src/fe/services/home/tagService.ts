@@ -66,7 +66,16 @@ export function useVehicleOwner(id: string) {
 
         if (response?.success && response?.data) {
           // Set vehicle owner from the populated user_id field
-          setVehicleOwner(response.data.user_id || null);
+          const owner = response.data.user_id;
+
+          if (owner) {
+            setVehicleOwner({
+              ...owner,
+              vehicle_type: response.data.type,
+            });
+          } else {
+            setVehicleOwner(null);
+          }
         } else {
           setError(response?.message || "Failed to fetch tag data");
           setVehicleOwner(null);

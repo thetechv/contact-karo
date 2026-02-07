@@ -34,7 +34,13 @@ export const VehicleInfo: React.FC<VehicleInfoProps> = ({
 
   return (
     <div className={s.container}>
-      <h1 className={s.title}>Contact Vehicle Owner.</h1>
+      <h1 className={s.title}>
+        Contact{" "}
+        {vehicleType
+          ? vehicleType.charAt(0).toUpperCase() + vehicleType.slice(1)
+          : "Vehicle"}{" "}
+        Owner
+      </h1>
 
       <div className={s.plateContainer}>
         <div className={s.plateWrapper}>
