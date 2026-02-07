@@ -27,7 +27,7 @@ export const registerFormFields: FormFieldConfig[] = [
     name: "whatsapp",
     label: "WhatsApp Number",
     type: "tel",
-    required: true,
+    required: false,
     placeholder: "9876543210",
   },
   {
@@ -100,7 +100,7 @@ export const ownerFormFields: FormFieldConfig[] = [
     name: "whatsapp",
     label: "WhatsApp Number",
     type: "tel",
-    required: true,
+    required: false,
     placeholder: "9876543210",
   },
   {
@@ -109,6 +109,26 @@ export const ownerFormFields: FormFieldConfig[] = [
     type: "email",
     required: true,
     placeholder: "your.email@example.com",
+  },
+  {
+    name: "vehicle_no",
+    label: "Vehicle Number",
+    type: "text",
+    required: true,
+    placeholder: "DL01AB1234",
+  },
+  {
+    name: "vehicle_type",
+    label: "Vehicle Type",
+    type: "select",
+    required: false,
+    placeholder: "Select vehicle type",
+    options: [
+      { value: "car", label: "Car" },
+      { value: "bike", label: "Bike" },
+      { value: "scooter", label: "Scooter" },
+      { value: "other", label: "Other" },
+    ],
   },
   {
     name: "emergency_contact_1",
@@ -128,7 +148,7 @@ export const ownerFormFields: FormFieldConfig[] = [
     name: "address",
     label: "Address",
     type: "textarea",
-    required: true,
+    required: false,
     placeholder: "Enter your full address",
     rows: 2,
   },
