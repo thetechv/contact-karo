@@ -14,6 +14,7 @@
     "cookie": "^1.1.1",
     "formik": "^2.4.9",
     "inrext-framework": "^1.0.0",
+    "ioredis": "^5.9.2",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.563.0",
     "mongoose": "^9.1.5",

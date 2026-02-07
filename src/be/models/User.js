@@ -39,12 +39,6 @@ const userSchema = new mongoose.Schema(
       index: true,
     },
 
-    vehicle_type: {
-      type: String,
-      enum: ["car", "bike", "scooter", "other"],
-      default: "car",
-    },
-
     // Emergency contacts
     emergency_contact_1: {
       type: String,
