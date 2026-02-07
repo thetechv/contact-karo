@@ -13,7 +13,7 @@ export const Footer: React.FC = () => {
           <div className="space-y-6">
             <div>
               <h3 className="text-2xl font-black tracking-tighter text-white">
-                Contact<span className="text-yellow-500">Karo</span>
+                contact<span className="text-yellow-500">Karo</span>
               </h3>
               <p className="text-gray-500 text-sm mt-4 leading-relaxed">
                 Privacy and Security at its Best. <br /> ContactKaro Vehicle
@@ -24,7 +24,7 @@ export const Footer: React.FC = () => {
             <div className="flex gap-4">
               {/* Social Icons from previous version */}
               <a
-                href="#"
+                href="https://www.instagram.com/contactkarotag?igsh=dmlvbW10cnY2Mms4"
                 className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:bg-yellow-500 hover:text-black transition-all duration-300"
               >
                 <svg
@@ -36,7 +36,7 @@ export const Footer: React.FC = () => {
                 </svg>
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/contactkarotag?igsh=dmlvbW10cnY2Mms4"
                 className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:bg-yellow-500 hover:text-black transition-all duration-300"
               >
                 <svg
@@ -48,7 +48,7 @@ export const Footer: React.FC = () => {
                 </svg>
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/contactkarotag?igsh=dmlvbW10cnY2Mms4"
                 className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-gray-400 hover:bg-yellow-500 hover:text-black transition-all duration-300"
               >
                 <svg

@@ -11,7 +11,7 @@ export const Navbar: React.FC = () => {
         {/* Logo */}
         <div className="flex items-center gap-2">
           <span className="text-2xl font-black tracking-tighter text-gray-900 dark:text-gray-50">
-            Contact<span className="text-yellow-500">Karo</span>
+            contact<span className="text-yellow-500">Karo</span>
           </span>
         </div>
 

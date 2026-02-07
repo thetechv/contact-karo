@@ -13,7 +13,7 @@ export const Features: React.FC = () => {
         {/* Section Header */}
         <div className="text-center mb-20">
           <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-gray-50 mb-6 tracking-tight">
-            Why Choose <span className="text-yellow-500">ContactKaro?</span>
+            Why Choose contact<span className="text-yellow-500">Karo?</span>
           </h2>
           <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
             Advanced privacy features designed for the modern vehicle owner.
