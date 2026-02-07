@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, type ChangeEvent, type FormEvent } from "react";
+import { useState, useMemo, useCallback, type ChangeEvent, type FormEvent } from "react";
 
 // Types
 export interface Batch {
@@ -30,7 +30,7 @@ export const useBatches = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const loadBatches = async () => {
+  const loadBatches = useCallback(async () => {
     try {
       setErrorMessage("");
       const response = await fetch("/api/v0/batch");
@@ -46,7 +46,7 @@ export const useBatches = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   return {
     batches,

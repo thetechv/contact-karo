@@ -16,7 +16,7 @@ class QrBatchService extends Service {
 
   async createBatch(req, res) {
     try {
-      const { batch_id, qty, created_by, note } = req.body || {};
+      const { batch_id, qty, created_by, note, type } = req.body || {};
       if (!batch_id || !qty) {
         return res.status(400).json({ success: false, message: "batch_id, qty, created_by are required" });
       }
@@ -24,8 +24,8 @@ class QrBatchService extends Service {
       const exists = await QrBatch.findOne({ batch_id }).lean();
       if (exists) return res.status(409).json({ success: false, message: "batch_id already exists" });
 
-      const batch = await QrBatch.create({ batch_id, qty, created_by, note });
-      await generateBatchQR(batch._id, qty);
+      const batch = await QrBatch.create({ batch_id, qty, created_by, note, type });
+      await generateBatchQR(batch._id, qty, type);
       return res.status(201).json({ success: true, data: batch });
     } catch (err) {
       return res.status(500).json({ success: false, message: err?.message || "Server error" });

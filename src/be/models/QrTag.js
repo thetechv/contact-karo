@@ -3,7 +3,7 @@ import { Schema, model, models, Types } from "mongoose";
 const QrTagSchema = new Schema(
   {
     
-    type: { type: String, enum: ["vehicle", "personal"], required: false },
+    type: { type: String, required: false },
 
     // Only reference to batch
     batch_ref: { type: Types.ObjectId, ref: "QrBatch", required: true, index: true },
