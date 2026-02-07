@@ -69,8 +69,13 @@ export function TagPage() {
   });
 
   const handleOwnerFormSubmit = async (data: any) => {
-    await submitOwnerForm(data);
-    closeOwnerLoginModal();
+    try {
+      await submitOwnerForm(data);
+      closeOwnerLoginModal();
+    } catch (error) {
+      // Error will be handled by the OwnerLoginFlow component
+      throw error;
+    }
   };
 
   return (
