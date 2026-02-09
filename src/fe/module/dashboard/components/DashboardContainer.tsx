@@ -55,7 +55,7 @@ export const DashboardContainer = () => {
       />
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-10">
+          <div className="mx-auto flex w-full max-w-full flex-col gap-8 px-6 py-10">
             <DashboardHeader router={router} handleLogout={handleLogout} />
             {renderModuleContent()}
           </div>

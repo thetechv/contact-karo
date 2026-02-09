@@ -18,13 +18,6 @@ export const EmployeesHeader = ({
           Employee Management
         </h1>
         <div className="flex gap-3">
-          <Button
-            variant="outline"
-            onClick={onBackToDashboard}
-            className="dark:border-gray-700 dark:text-white dark:hover:bg-gray-800"
-          >
-            ← Dashboard
-          </Button>
           <Button onClick={onAddEmployee}>+ Add Employee</Button>
         </div>
       </div>

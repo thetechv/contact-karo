@@ -10,7 +10,6 @@ export const TagsHeader = ({ onBackToDashboard }: TagsHeaderProps) => {
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">
         QR Tags Management
       </h1>
-      <Button onClick={onBackToDashboard}>← Dashboard</Button>
     </div>
   );
 };

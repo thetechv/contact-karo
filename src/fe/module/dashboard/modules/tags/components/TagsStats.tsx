@@ -22,11 +22,6 @@ export const TagsStats = ({ stats }: TagsStatsProps) => {
         value={stats.unassigned}
         color="bg-yellow-100 dark:bg-yellow-900/30"
       />
-      <StatCard
-        label="Disabled"
-        value={stats.disabled}
-        color="bg-red-100 dark:bg-red-900/30"
-      />
     </div>
   );
 };

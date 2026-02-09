@@ -23,7 +23,6 @@ export const TagsFilters = ({ filter, onFilterChange }: TagsFiltersProps) => {
         <option value="">All Status</option>
         <option value="active">Active</option>
         <option value="unassigned">Unassigned</option>
-        <option value="disabled">Disabled</option>
       </select>
     </div>
   );
