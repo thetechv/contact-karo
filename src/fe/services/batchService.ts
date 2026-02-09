@@ -10,6 +10,8 @@ export class BatchService {
    */
   static async createBatch(data: BatchFormData): Promise<ApiResponse> {
     try {
+      // Debug: log outgoing payload
+      console.debug("BatchService.createBatch payload:", data);
       const response = await fetch(`${API_BASE_URL}/batch`, {
         method: "POST",
         headers: {
@@ -19,10 +21,18 @@ export class BatchService {
           batch_id: data.name.trim(),
           qty: data.qty,
           note: data.notes.trim() || undefined,
+          type: data.type,
+          isTestBatch: data.isTestBatch,
         }),
       });
 
       const result = await response.json();
+      // Debug: log server response
+      console.debug("BatchService.createBatch response:", {
+        status: response.status,
+        ok: response.ok,
+        body: result,
+      });
 
       if (!response.ok) {
         return {

@@ -19,6 +19,8 @@ const initialValues: BatchFormData = {
   name: "",
   qty: 1,
   notes: "",
+  type: "car",
+  isTestBatch: false,
 };
 
 export const BatchForm = ({ onSubmit, onSuccess }: BatchFormProps) => {
@@ -84,6 +86,47 @@ export const BatchForm = ({ onSubmit, onSuccess }: BatchFormProps) => {
                   className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all"
                   disabled={formState.isSubmitting}
                 />
+              </FormFieldWrapper>
+
+              <FormFieldWrapper
+                name="type"
+                label="Type"
+                required
+                error={errors.type}
+                touched={touched.type}
+              >
+                <Field
+                  name="type"
+                  as="select"
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all"
+                  disabled={formState.isSubmitting}
+                >
+                  <option value="car">Car</option>
+                  <option value="bike">Bike</option>
+                  <option value="bag-tag">Bag Tag</option>
+                  <option value="door-tag">Door Tag</option>
+                  <option value="business-card">Business Card</option>
+                </Field>
+              </FormFieldWrapper>
+
+              <FormFieldWrapper
+                name="isTestBatch"
+                label="Test batch"
+                error={errors.isTestBatch}
+                touched={touched.isTestBatch}
+                className="sm:col-span-2"
+              >
+                <label className="inline-flex items-center gap-3">
+                  <Field
+                    name="isTestBatch"
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-gray-300 text-yellow-500 focus:ring-yellow-400"
+                    disabled={formState.isSubmitting}
+                  />
+                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                    Create as a test batch (no distribution)
+                  </span>
+                </label>
               </FormFieldWrapper>
 
               <FormFieldWrapper

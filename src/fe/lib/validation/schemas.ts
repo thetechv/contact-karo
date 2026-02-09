@@ -49,6 +49,13 @@ export const batchFormSchema = Yup.object({
   notes: Yup.string()
     .max(500, VALIDATION_MESSAGES.maxLength("Notes", 500))
     .optional(),
+  type: Yup.string()
+    .oneOf(
+      ["car", "bike", "bag-tag", "door-tag", "business-card"],
+      "Please select a valid batch type",
+    )
+    .required(VALIDATION_MESSAGES.required("Batch type")),
+  isTestBatch: Yup.boolean().optional(),
 });
 
 // Vehicle Registration Schema
@@ -154,6 +161,8 @@ export interface BatchFormData {
   name: string;
   qty: number;
   notes: string;
+  type: string;
+  isTestBatch: boolean;
 }
 
 export interface VehicleRegistrationFormData {

@@ -23,18 +23,6 @@ export const DashboardHeader = ({
           </div>
           <div className="flex gap-2">
             <button
-              onClick={() => router.push("/dashboard/tags")}
-              className="rounded-lg bg-black text-white px-4 py-2 text-sm font-semibold hover:bg-gray-800 transition"
-            >
-              Tags
-            </button>
-            <button
-              onClick={() => router.push("/dashboard/employees")}
-              className="rounded-lg bg-black text-white px-4 py-2 text-sm font-semibold hover:bg-gray-800 transition"
-            >
-              Employees
-            </button>
-            <button
               onClick={handleLogout}
               className="rounded-lg border-2 border-black text-black px-4 py-2 text-sm font-semibold hover:bg-black hover:text-white transition"
             >
