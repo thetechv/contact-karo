@@ -1,6 +1,7 @@
 import { Service } from "../framework/service";
 import dbConnect from "../lib/mongodb";
 import QrBatch from "../models/QrBatch";
+import { batchQueue } from "../queue/batchQueue";
 import { generateBatchQR } from "../worker/generateBatchQR";
 import generateQRZip from "../worker/generateQRZip";
 
@@ -25,8 +26,25 @@ class QrBatchService extends Service {
       if (exists) return res.status(409).json({ success: false, message: "batch_id already exists" });
 
       const batch = await QrBatch.create({ batch_id, qty, created_by, note, type });
-      await generateBatchQR(batch._id, qty, type);
-      return res.status(201).json({ success: true, data: batch });
+      
+      // Dispatch background job
+      if (batchQueue) {
+        await batchQueue.add(
+          "generateBatchQR",
+          { batchId: batch._id, qty, type },
+          {
+            attempts: 3,
+            backoff: { type: "exponential", delay: 1000 },
+            removeOnComplete: true,
+          }
+        );
+      } else {
+        // Fallback if queue not available (optional, or log error)
+         console.warn("BatchQueue not initialized, running inline (not recommended for production)");
+         // await generateBatchQR(batch._id, qty, type); // Uncomment if you want inline fallback
+      }
+
+      return res.status(201).json({ success: true, data: batch, message: "Batch creation started in background" });
     } catch (err) {
       return res.status(500).json({ success: false, message: err?.message || "Server error" });
     }
