@@ -3,8 +3,8 @@ import crypto from "crypto";
 
 const redis = new Redis(process.env.REDIS_URL);
 
-const MAX_IP_REQUESTS = 50;
-const MAX_PHONE_REQUESTS = 5;
+const MAX_IP_REQUESTS = 60;
+const MAX_PHONE_REQUESTS = 10;
 
 export async function publicAuth(req, res, next) {
   const ip = req.ip || req.socket.remoteAddress;
@@ -45,7 +45,7 @@ export async function publicAuth(req, res, next) {
       if (phoneCount > MAX_PHONE_REQUESTS) {
         return res.status(429).json({
           success: false,
-          message: "OTP limit exceeded for this phone number",
+          message: "OTP limit exceeded for this phone number. Please try again after 10 minutes.",
         });
       }
     }
