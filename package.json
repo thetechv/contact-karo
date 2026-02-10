@@ -2,16 +2,20 @@
   "name": "contactkaro-app",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "run-worker": "node src/be/worker/worker.js"
   },
   "dependencies": {
     "archiver": "^7.0.1",
     "bcryptjs": "^3.0.3",
+    "bullmq": "^5.67.3",
     "cookie": "^1.1.1",
+    "dotenv": "^17.2.4",
     "formik": "^2.4.9",
     "inrext-framework": "^1.0.0",
     "ioredis": "^5.9.2",
