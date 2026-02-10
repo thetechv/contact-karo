@@ -1,15 +1,5 @@
 // Utility functions
 
-export function formatDate(date: string | Date): string {
-  if (!date) return "";
-  const d = new Date(date);
-  return d.toLocaleDateString("en-IN", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
 export function formatDateTime(date: string | Date): string {
   if (!date) return "";
   const d = new Date(date);
@@ -20,31 +10,6 @@ export function formatDateTime(date: string | Date): string {
     hour: "2-digit",
     minute: "2-digit",
   });
-}
-
-export function formatPhone(phone: string): string {
-  if (!phone) return "";
-  // Format 10 digit phone as XXX-XXX-XXXX
-  const cleaned = phone.replace(/\D/g, "");
-  if (cleaned.length === 10) {
-    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
-  }
-  return phone;
-}
-
-export function validateEmail(email: string): boolean {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(email);
-}
-
-export function validatePhone(phone: string): boolean {
-  const cleaned = phone.replace(/\D/g, "");
-  return cleaned.length === 10;
-}
-
-export function validateVehicleNo(vehicleNo: string): boolean {
-  // Basic validation for Indian vehicle numbers
-  return vehicleNo.trim().length >= 4;
 }
 
 export function cn(...classes: (string | undefined | null | false)[]): string {
