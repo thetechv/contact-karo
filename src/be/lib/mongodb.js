@@ -19,12 +19,28 @@ async function dbConnect() {
   }
 
   if (!globalAny._mongo.promise) {
-    globalAny._mongo.promise = mongoose
-      .connect(MONGODB_URI)
-      .then((m) => m);
+    const opts = {
+      bufferCommands: false, // Disable Mongoose buffering to fail fast if not connected
+      serverSelectionTimeoutMS: 5000, // Fail after 5s if DB is unreachable
+      socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+    };
+
+    globalAny._mongo.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+      return mongoose;
+    }).catch((err) => {
+      console.error("MongoDB connection failed, clearing promise cache:", err);
+      globalAny._mongo.promise = null; // Clear promise so we can retry next time
+      throw err;
+    });
   }
 
-  globalAny._mongo.conn = await globalAny._mongo.promise;
+  try {
+    globalAny._mongo.conn = await globalAny._mongo.promise;
+  } catch (e) {
+    globalAny._mongo.promise = null; // Ensure promise is cleared on await failure too
+    throw e;
+  }
+
   return globalAny._mongo.conn;
 }
 
