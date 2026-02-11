@@ -1,5 +1,5 @@
 
-const Redis = require("ioredis");
+import Redis from "ioredis";
 
 // Make sure this matches your .env or default local
 const redis = new Redis("redis://localhost:6379");

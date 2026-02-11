@@ -1,10 +1,19 @@
 import Redis from "ioredis";
 import crypto from "crypto";
 
-const redis = new Redis(process.env.REDIS_URL);
+const redis = new Redis(process.env.REDIS_URL, {
+  connectTimeout: 2000, // 2s timeout for initial connection
+  maxRetriesPerRequest: 1, // Fail fast on commands
+  retryStrategy: (times) => Math.min(times * 50, 2000), // Retry backoff
+});
 
-const MAX_IP_REQUESTS = 50;
-const MAX_PHONE_REQUESTS = 5;
+// Prevent crash on Redies connection error
+redis.on("error", (err) => {
+  console.error("Redis connection error:", err);
+});
+
+const MAX_IP_REQUESTS = 60;
+const MAX_PHONE_REQUESTS = 10;
 
 export async function publicAuth(req, res, next) {
   const ip = req.ip || req.socket.remoteAddress;
@@ -45,7 +54,7 @@ export async function publicAuth(req, res, next) {
       if (phoneCount > MAX_PHONE_REQUESTS) {
         return res.status(429).json({
           success: false,
-          message: "OTP limit exceeded for this phone number",
+          message: "OTP limit exceeded for this phone number. Please try again after 10 minutes.",
         });
       }
     }

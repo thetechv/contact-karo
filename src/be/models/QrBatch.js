@@ -1,4 +1,5 @@
-import { Schema, model, models, Types } from "mongoose";
+import mongoose from "mongoose";
+const { Schema, model, models, Types } = mongoose;
 
 const batchType = [
   "car","bike","bag-tag","door-tag","business-card"
