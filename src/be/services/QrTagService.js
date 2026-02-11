@@ -11,7 +11,7 @@ import twilio from "../lib/twilio";
 class QrTagService extends Service {
   constructor() {
     super();
-    dbConnect();
+    // dbConnect() is now handled in methods to ensure connection state
   }
 
   getId(req) {
@@ -23,6 +23,7 @@ class QrTagService extends Service {
 
   async createTag(req, res) {
     try {
+      await dbConnect();
       const { qr_id, batch_ref } = req.body || {};
       if (!qr_id || !batch_ref) {
         return res.status(400).json({ success: false, message: "qr_id and batch_ref are required" });
@@ -43,6 +44,7 @@ class QrTagService extends Service {
 
   async getAllTags(req, res) {
     try {
+      await dbConnect();
       const { status, batch_ref, user_id } = req.query || {};
       const filter = {};
       if (status) filter.status = status;
@@ -58,6 +60,7 @@ class QrTagService extends Service {
 
   async getTagById(req, res) {
     try {
+      await dbConnect();
       const id = this.getId(req);
       if (!id) return res.status(400).json({ success: false, message: "id is required" });
 
@@ -72,6 +75,7 @@ class QrTagService extends Service {
 
   async getTagByQrId(req, res) {
     try {
+      await dbConnect();
       const qr_id = this.getQrId(req);
       if (!qr_id) return res.status(400).json({ success: false, message: "qr_id is required" });
 
@@ -95,6 +99,7 @@ class QrTagService extends Service {
 
   async updateTag(req, res) {
     try {
+      await dbConnect();
       const tagId = this.getId(req);
       const userId = req?.user?._id;
       const updates = req.body || {};
@@ -160,6 +165,7 @@ class QrTagService extends Service {
   // Generate and send OTP for updating tag details.
   async generateOtpToUpdateTag(req, res) {
     try {
+      await dbConnect();
       const tagId = this.getId(req);
       const phone = req?.body?.phone;
 
@@ -229,6 +235,7 @@ class QrTagService extends Service {
   //verify OTP for updating tag details
   async verifyOtp(req, res) {
     try {
+      await dbConnect();
       const tagId = this.getId(req);
       const { otp, phone } = req.body || {};
 
@@ -307,6 +314,7 @@ class QrTagService extends Service {
   // ✅ Generate and send OTP for tag
   async generateOtp(req, res) {
     try {
+      await dbConnect();
       const tagId = this.getId(req);
       const phone = req?.body?.phone;
 
@@ -367,6 +375,7 @@ class QrTagService extends Service {
 
   // ✅ Activate QR = assign tag to user and link back user.qr_tag_id
   async activateQr(req, res) {
+    await dbConnect();
     const session = await mongoose.startSession();
     try {
       const tagId = this.getId(req);
