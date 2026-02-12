@@ -41,28 +41,29 @@ class QrBatchService extends Service {
       });
 
       // Dispatch background job
-      if (batchQueue) {
-        await batchQueue.add(
-          "generateBatchQR",
-          { batchId: batch._id, qty, type },
-          {
-            attempts: 3,
-            backoff: { type: "exponential", delay: 1000 },
-            removeOnComplete: true,
-          },
-        );
-      } else {
-        // Fallback if queue not available (optional, or log error)
-        console.warn(
-          "BatchQueue not initialized, running inline (not recommended for production)",
-        );
-        // await generateBatchQR(batch._id, qty, type); // Uncomment if you want inline fallback
-      }
+      // if (batchQueue) {
+      //   await batchQueue.add(
+      //     "generateBatchQR",
+      //     { batchId: batch._id, qty, type },
+      //     {
+      //       attempts: 3,
+      //       backoff: { type: "exponential", delay: 1000 },
+      //       removeOnComplete: true,
+      //     },
+      //   );
+      // } else {
+      //   // Fallback if queue not available (optional, or log error)
+      //   console.warn(
+      //     "BatchQueue not initialized, running inline (not recommended for production)",
+      //   );
+      // }
+
+      await generateBatchQR(batch._id, qty, type); // Uncomment if you want inline fallback
 
       return res.status(201).json({
         success: true,
         data: batch,
-        message: "Batch creation started in background",
+        // message: "Batch creation started in background",
       });
     } catch (err) {
       return res
