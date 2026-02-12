@@ -8,3 +8,5 @@ export { CountdownTimer } from "./CountdownTimer";
 export { LoadingSpinner } from "./LoadingSpinner";
 export { Badge } from "./Badge";
 export { Modal } from "./Modal";
+export { Pagination } from "./Pagination";
+

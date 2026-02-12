@@ -1,19 +1,50 @@
 "use client";
 
-import { LoadingSpinner } from "@/fe/components/ui";
+import { LoadingSpinner, Pagination } from "@/fe/components/ui";
 import { TagsHeader } from "./TagsHeader";
 import { TagsStats } from "./TagsStats";
 import { TagsFilters } from "./TagsFilters";
 import { TagsTable } from "./TagsTable";
 import { useTags, useTagFilters } from "@/fe/services/dashboard/tags";
 import { useSharedAuthCheck } from "@/fe/services/auth";
+import { useEffect } from "react";
 
 export const TagsContainer = () => {
-  const { tags, loading, error, loadTags } = useTags();
-  const { router } = useSharedAuthCheck({ loadData: loadTags });
-  const { filter, filteredTags, stats, updateFilter } = useTagFilters(tags);
+  const {
+    tags,
+    loading,
+    error,
+    loadTags,
+    pagination,
+    stats,
+    setPage,
+    setLimit,
+  } = useTags();
+  const { router } = useSharedAuthCheck({
+    loadData: () => loadTags(),
+  });
+  const {
+    filter,
+    filteredTags: clientFilteredTags,
+    stats: localStats,
+    updateFilter,
+  } = useTagFilters(tags);
 
-  if (loading) {
+  // Reload tags when filter status changes
+  useEffect(() => {
+    loadTags({ page: 1, status: filter.status });
+  }, [filter.status]);
+
+  // Use backend stats if available, otherwise local stats (fallback)
+  const displayStats = stats || localStats;
+
+  // If using backend search support, pass search term to loadTags.
+  // Currently backend only supports status filter, so we rely on client-side filtering for search
+  // applied to the fetched page.
+  // Note: If you want search across all items, backend search implementation is needed.
+  const displayTags = filter.search ? clientFilteredTags : tags;
+
+  if (loading && !tags.length) {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
         <LoadingSpinner size="lg" />
@@ -26,7 +57,7 @@ export const TagsContainer = () => {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <TagsHeader onBackToDashboard={() => router.push("/dashboard")} />
-          <TagsStats stats={stats} />
+          <TagsStats stats={displayStats} />
           <TagsFilters filter={filter} onFilterChange={updateFilter} />
         </div>
 
@@ -36,7 +67,18 @@ export const TagsContainer = () => {
           </div>
         )}
 
-        <TagsTable tags={filteredTags} />
+        <TagsTable tags={displayTags} />
+
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          onPageChange={setPage}
+          pageSize={pagination.limit}
+          onPageSizeChange={setLimit}
+          totalItems={pagination.total}
+          title="Tags per page"
+          loading={loading}
+        />
       </div>
     </main>
   );

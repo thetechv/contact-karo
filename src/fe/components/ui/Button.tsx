@@ -21,7 +21,7 @@ export const Button: React.FC<ButtonProps> = ({
       "bg-yellow-400 text-black hover:bg-yellow-500 shadow-sm hover:shadow-md",
     secondary: "bg-gray-800 text-white hover:bg-gray-900",
     outline:
-      "border-2 border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white",
+      "border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800",
   };
 
   const sizes = {

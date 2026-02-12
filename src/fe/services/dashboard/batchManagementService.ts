@@ -27,18 +27,46 @@ export const initialFormState: BatchFormState = {
 // Batches hook service
 export const useBatches = () => {
   const [batches, setBatches] = useState<Batch[]>([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1,
+  });
+  const [stats, setStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const loadBatches = useCallback(async () => {
+  const loadBatches = useCallback(async (params: any = {}) => {
     try {
       setErrorMessage("");
-      const response = await fetch("/api/v0/batch");
+      setIsLoading(true);
+      const { page = pagination.page, limit = pagination.limit } = params;
+
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+      });
+
+      const response = await fetch(`/api/v0/batch?${queryParams}`);
       const payload = await response.json();
       if (!response.ok || !payload?.success) {
         throw new Error(payload?.message || "Unable to load batches.");
       }
       setBatches(payload?.data || []);
+
+      if (payload.pagination) {
+        setPagination({
+          page: payload.pagination.page,
+          limit: payload.pagination.limit,
+          total: payload.pagination.total,
+          totalPages: payload.pagination.totalPages,
+        });
+      }
+
+      if (payload.stats) {
+        setStats(payload.stats);
+      }
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to load batches.";
@@ -46,7 +74,15 @@ export const useBatches = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [pagination.page, pagination.limit]);
+
+  const setPage = useCallback((page: number) => {
+    loadBatches({ page });
+  }, [loadBatches]);
+
+  const setLimit = useCallback((limit: number) => {
+    loadBatches({ limit, page: 1 });
+  }, [loadBatches]);
 
   return {
     batches,
@@ -54,6 +90,10 @@ export const useBatches = () => {
     errorMessage,
     loadBatches,
     setErrorMessage,
+    pagination,
+    stats,
+    setPage,
+    setLimit,
   };
 };
 

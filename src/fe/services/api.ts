@@ -6,6 +6,13 @@ type ApiResponse<T = any> = {
   success: boolean;
   message?: string;
   data?: T;
+  pagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+  stats?: any;
 };
 
 class ApiService {
@@ -43,11 +50,13 @@ class ApiService {
     status?: string;
     batch_ref?: string;
     user_id?: string;
+    page?: number;
+    limit?: number;
   }) {
     const query = new URLSearchParams(
-      params as Record<string, string>,
+      params as unknown as Record<string, string>,
     ).toString();
-    return this.request<any[]>(`/tag${query ? `?${query}` : ""}`);
+    return this.request<any>(`/tag${query ? `?${query}` : ""}`);
   }
 
   async generateOtp(tagId: string, phone: string) {

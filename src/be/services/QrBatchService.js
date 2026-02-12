@@ -74,8 +74,34 @@ class QrBatchService extends Service {
   async getAllBatches(req, res) {
     try {
       await dbConnect(); // Ensure DB connection for worker access
-      const batches = await QrBatch.find({}).sort({ createdAt: -1 }).lean();
-      return res.status(200).json({ success: true, data: batches });
+      const { page = 1, limit = 10 } = req.query || {};
+      
+      const pageNum = Math.max(1, parseInt(page));
+      const limitNum = parseInt(limit);
+      const skip = (pageNum - 1) * limitNum;
+
+      const total = await QrBatch.countDocuments({});
+      const batches = await QrBatch.find({})
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum)
+        .lean();
+
+      const stats = {
+        total: await QrBatch.countDocuments({}),
+      };
+
+      return res.status(200).json({
+        success: true,
+        data: batches,
+        pagination: {
+          total,
+          page: pageNum,
+          limit: limitNum,
+          totalPages: Math.ceil(total / limitNum),
+        },
+        stats,
+      });
     } catch (err) {
       return res
         .status(500)

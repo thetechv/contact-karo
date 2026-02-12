@@ -45,14 +45,43 @@ class QrTagService extends Service {
   async getAllTags(req, res) {
     try {
       await dbConnect();
-      const { status, batch_ref, user_id } = req.query || {};
+      const { status, batch_ref, user_id, page = 1, limit = 10 } = req.query || {};
       const filter = {};
       if (status) filter.status = status;
       if (batch_ref) filter.batch_ref = batch_ref;
       if (user_id) filter.user_id = user_id;
 
-      const tags = await QrTag.find(filter).populate("batch_ref").populate("user_id").sort({ createdAt: -1 }).lean();
-      return res.status(200).json({ success: true, data: tags });
+      const pageNum = Math.max(1, parseInt(page));
+      const limitNum = parseInt(limit);
+      const skip = (pageNum - 1) * limitNum;
+
+      const total = await QrTag.countDocuments(filter);
+      const tags = await QrTag.find(filter)
+        .populate("batch_ref")
+        .populate("user_id")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum)
+        .lean();
+
+      const stats = {
+        total: await QrTag.countDocuments({}),
+        active: await QrTag.countDocuments({ status: "active" }),
+        unassigned: await QrTag.countDocuments({ status: "unassigned" }),
+        disabled: await QrTag.countDocuments({ status: "disabled" }),
+      };
+
+      return res.status(200).json({
+        success: true,
+        data: tags,
+        pagination: {
+          total,
+          page: pageNum,
+          limit: limitNum,
+          totalPages: Math.ceil(total / limitNum),
+        },
+        stats,
+      });
     } catch (err) {
       return res.status(500).json({ success: false, message: err?.message || "Server error" });
     }

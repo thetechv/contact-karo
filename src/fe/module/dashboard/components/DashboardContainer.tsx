@@ -12,7 +12,7 @@ import BatchService from "@/fe/services/batchService";
 import { BatchFormData, ApiResponse } from "@/fe/lib/validation";
 
 export const DashboardContainer = () => {
-  const { batches, isLoading, errorMessage, loadBatches } = useBatches();
+  const { batches, isLoading, errorMessage, loadBatches, pagination, setPage, setLimit } = useBatches();
   const { handleLogout, router } = useAuthCheck(loadBatches);
   const { activeModule, setActiveModule } = useDashboardModule();
 
@@ -35,7 +35,13 @@ export const DashboardContainer = () => {
               onSubmit={handleBatchSubmit}
               onSuccess={handleBatchSuccess}
             />
-            <BatchList batches={batches} isLoading={isLoading} />
+            <BatchList 
+              batches={batches} 
+              isLoading={isLoading}
+              pagination={pagination}
+              setPage={setPage}
+              setLimit={setLimit}
+            />
           </div>
         );
       case "employees":
