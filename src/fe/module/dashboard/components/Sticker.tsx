@@ -1,38 +1,58 @@
-"use client";
+import React from "react";
+import { QRCodeSVG } from "qrcode.react";
 
-import { QRCodeCanvas } from "qrcode.react";
+type Props = {
+  value?: string;
+  size?: number; // diameter in px
+};
 
-interface StickerProps {
-  qrCodeValue: string;
-  size: number; // size in pixels
-}
-
-export const Sticker = ({ qrCodeValue, size }: StickerProps) => {
-  const stickerStyle = {
-    width: `${size}px`,
-    height: `${size}px`,
-  };
-
-  const qrCodeSize = size * 0.4; // QR code is 40% of the sticker size
+export default function StickerOnly({ value, size = 360 }: Props) {
+  const qrSize = Math.round(size * 0.44);
 
   return (
     <div
-      className="relative flex flex-col items-center justify-center rounded-full bg-black text-white"
-      style={stickerStyle}
+      className="relative rounded-full overflow-hidden shadow-2xl border-[6px] border-white/5 flex items-center justify-center text-white"
+      style={{
+        width: size,
+        height: size,
+        background:
+          "radial-gradient(circle at 30% 20%, rgba(255,255,255,0.03), transparent 12%), linear-gradient(180deg,#0b0b0b,#121212)",
+      }}
+      aria-label="Emergency sticker"
     >
-      <div className="absolute top-[10%] rounded-full bg-gray-700 px-3 py-1 text-xs">
-        contactkaro.in
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-black/60 px-4 py-1 rounded-full border border-white/6 text-[10px] font-extrabold tracking-wider">
+        contactKaro.in
       </div>
-      <div className="p-2 bg-white rounded-lg">
-        <QRCodeCanvas value={qrCodeValue} size={qrCodeSize} />
+
+      <div className="flex flex-col items-center">
+        <div className="bg-white p-3 rounded-xl shadow-lg">
+          {value ? (
+            <QRCodeSVG value={value} size={qrSize} level="H" />
+          ) : (
+            <div className="w-[${qrSize}px] h-[${qrSize}px] flex items-center justify-center text-xs font-bold text-black">
+              NO QR DATA
+            </div>
+          )}
+        </div>
+
+        <div className="mt-3 text-center font-extrabold text-[14px] tracking-wider">
+          IN CASE OF EMERGENCY
+        </div>
+        <div className="mt-1 text-center text-[10px] font-extrabold opacity-70 tracking-widest">
+          SCAN TO CONTACT
+        </div>
       </div>
-      <div className="mt-2 text-center">
-        <p className="font-bold text-sm">IN CASE OF EMERGENCY</p>
-        <p className="text-xs tracking-widest">SCAN TO CONTACT</p>
-      </div>
-      <div className="absolute bottom-[10%] flex items-center text-xs">
-        <span className="mr-1">⎊</span> POWERED BY TECHV
+
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full border border-white/6">
+        <img
+          src="/techv.png"
+          alt="TechV"
+          className="w-4 h-4 object-contain invert"
+        />
+        <div className="text-[11px] font-extrabold opacity-90 tracking-wider">
+          POWERED BY TECHV
+        </div>
       </div>
     </div>
   );
-};
+}
