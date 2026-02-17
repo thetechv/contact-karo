@@ -6,7 +6,7 @@ import { Button } from "@/fe/components/ui/Button";
 import { Input } from "@/fe/components/ui/Input";
 import { Select } from "@/fe/components/ui/Select";
 import type { Batch } from "../constants";
-import { Sticker } from "./Sticker";
+import { printStickerCSS } from "../styles";
 
 interface PrintModalProps {
   isOpen: boolean;
@@ -22,12 +22,34 @@ const convertToPx = (value: number, unit: string): number => {
   return value;
 };
 
+// Define sticker dimensions for different batch types
+const getStickerDimensions = (
+  batchType: string,
+): { width: number; height: number } => {
+  const dimensions = {
+    car: { width: 3.37, height: 2.125 }, // Credit card size
+    bike: { width: 2.1, height: 2.1 }, // Circular diameter
+    "bag-tag": { width: 1.0, height: 1.0 },
+    "door-tag": { width: 2.0, height: 2.0 },
+    "business-card": { width: 3.37, height: 2.125 },
+  };
+  return (
+    dimensions[batchType as keyof typeof dimensions] || {
+      width: 2.0,
+      height: 2.0,
+    }
+  );
+};
+
+// Determine sticker shape based on batch type
+const getStickerShape = (batchType: string): string => {
+  return batchType === "bike" ? "circular" : "rectangular";
+};
+
 export const PrintModal = ({ isOpen, onClose, batch }: PrintModalProps) => {
   const [paperWidth, setPaperWidth] = useState(8.5);
   const [paperHeight, setPaperHeight] = useState(11);
   const [paperUnit, setPaperUnit] = useState("in");
-  const [qrSize, setQrSize] = useState(2);
-  const [qrUnit, setQrUnit] = useState("in");
 
   if (!batch) return null;
 
@@ -46,11 +68,21 @@ export const PrintModal = ({ isOpen, onClose, batch }: PrintModalProps) => {
         (tag: { qr_id: string }) => `${window.location.origin}/${tag.qr_id}`,
       );
 
-      // Generate data URLs for each QR code using `qrcode` lib
-      const stickerSizeInPx = Math.round(convertToPx(qrSize, qrUnit));
+      // Generate QR code data URLs
+      const stickerDimensions = getStickerDimensions(batch.type);
+      const stickerWidthInPx = Math.round(
+        convertToPx(stickerDimensions.width, "in"),
+      );
+      const stickerHeightInPx = Math.round(
+        convertToPx(stickerDimensions.height, "in"),
+      );
+      const qrSizeInPx = Math.round(
+        Math.min(stickerWidthInPx, stickerHeightInPx) * 0.4,
+      );
+
       const dataUrls = await Promise.all(
         qrCodes.map((qr: string) =>
-          QRCodeLib.toDataURL(qr, { width: stickerSizeInPx }),
+          QRCodeLib.toDataURL(qr, { width: qrSizeInPx, margin: 1 }),
         ),
       );
 
@@ -58,30 +90,32 @@ export const PrintModal = ({ isOpen, onClose, batch }: PrintModalProps) => {
       if (printWindow) {
         const styles = `
           <style>
-            @media print {
-              body { -webkit-print-color-adjust: exact; }
-              @page { size: ${paperWidth}${paperUnit} ${paperHeight}${paperUnit}; margin: 0.5in; }
+            ${printStickerCSS}
+            @page { size: ${paperWidth}${paperUnit} ${paperHeight}${paperUnit}; margin: 0.5in; }
+            .sticker {
+              width: ${stickerWidthInPx}px;
+              height: ${stickerHeightInPx}px;
             }
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
-            .sticker-container { display:flex; flex-wrap:wrap; gap:12px; align-items:flex-start; }
-            .sticker { display:flex; flex-direction:column; align-items:center; justify-content:center; background:#000; color:#fff; border-radius:9999px; padding:8px; box-sizing:border-box; }
-            .sticker .badge { position:relative; top:0; background:#374151; padding:4px 8px; border-radius:9999px; font-size:10px; }
-            .sticker .qr-wrap { background:#fff; padding:8px; border-radius:8px; margin:8px 0; }
-            .sticker .title { font-weight:700; font-size:12px; text-align:center; }
-            .sticker .subtitle { font-size:10px; letter-spacing:2px; }
-            .powered { display:flex; align-items:center; gap:6px; font-size:10px; }
           </style>
         `;
 
+        const stickerShape = getStickerShape(batch.type);
         const stickersHtml = dataUrls
           .map((dataUrl: string) => {
             return `
-              <div class="sticker" style="width:${stickerSizeInPx}px; height:${stickerSizeInPx}px;">
-                <div class="badge">contactkaro.in</div>
-                <div class="qr-wrap"><img src="${dataUrl}" width="${stickerSizeInPx * 0.9}" height="${stickerSizeInPx * 0.9}"/></div>
-                <div class="title">IN CASE OF EMERGENCY</div>
-                <div class="subtitle">SCAN TO CONTACT</div>
-                <div class="powered">⎊ POWERED BY TECHV</div>
+              <div class="sticker ${stickerShape}">
+                <div class="top-badge">contactKaro.in</div>
+                <div class="sticker-content">
+                  <div class="qr-wrapper">
+                    <img src="${dataUrl}" width="${qrSizeInPx}" height="${qrSizeInPx}" />
+                  </div>
+                  <div class="emergency-text">IN CASE OF EMERGENCY</div>
+                  <div class="scan-text">SCAN TO CONTACT</div>
+                </div>
+                <div class="powered-by">
+                  <img src="/techv.png" alt="TechV" class="techv-logo" />
+                  <span>POWERED BY TECHV</span>
+                </div>
               </div>
             `;
           })
@@ -145,30 +179,19 @@ export const PrintModal = ({ isOpen, onClose, batch }: PrintModalProps) => {
           </div>
         </div>
         <div>
-          <label
-            htmlFor="qr-size"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            QR Code Size
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Sticker Size
           </label>
-          <div className="flex items-center gap-2 mt-1">
-            <Input
-              id="qr-size-value"
-              type="number"
-              placeholder="Size"
-              value={qrSize}
-              onChange={(e) => setQrSize(Number(e.target.value))}
-            />
-            <Select
-              id="qr-size-unit"
-              value={qrUnit}
-              onChange={(e) => setQrUnit(e.target.value)}
-              options={[
-                { value: "in", label: "inch" },
-                { value: "cm", label: "cm" },
-                { value: "px", label: "px" },
-              ]}
-            />
+          <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            {(() => {
+              const dims = getStickerDimensions(batch.type);
+              const shape = getStickerShape(batch.type);
+              if (shape === "circular") {
+                return `${dims.width}" diameter (circular - auto-determined by batch type: ${batch.type})`;
+              } else {
+                return `${dims.width}" × ${dims.height}" (rectangular - auto-determined by batch type: ${batch.type})`;
+              }
+            })()}
           </div>
         </div>
         <div className="flex justify-end gap-2 pt-4">
