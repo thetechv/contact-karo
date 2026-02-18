@@ -94,20 +94,23 @@ body {
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 1%;
-  background: rgba(255,255,255,0.05);
-  padding: 0.8% 2%;
+  gap: 8px;
+  background: rgba(255,255,255,0.08);
+  padding: 6px 12px;
   border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.06);
-  font-size: 2%;
-  font-weight: 800;
-  opacity: 0.9;
-  letter-spacing: 2px;
+  border: 1px solid rgba(255,255,255,0.1);
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.95;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
 }
 
 .techv-logo {
-  width: 3%;
-  height: 3%;
+  width: 12px;
+  height: 12px;
   filter: invert(1);
+  opacity: 0.9;
 }
 `;

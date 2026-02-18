@@ -114,7 +114,7 @@ export const PrintModal = ({ isOpen, onClose, batch }: PrintModalProps) => {
                 </div>
                 <div class="powered-by">
                   <img src="/techv.png" alt="TechV" class="techv-logo" />
-                  <span>POWERED BY TECHV</span>
+                  <span>BY TECHV</span>
                 </div>
               </div>
             `;
