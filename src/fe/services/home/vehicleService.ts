@@ -18,6 +18,7 @@ interface UseVehicleActionsProps {
   vehicleOwner: VehicleOwner | null;
   selectedReason: string | null;
   reasonOptions: ReasonOption[];
+  tagId: string;
 }
 
 // Vehicle actions hook service
@@ -25,6 +26,7 @@ export function useVehicleActions({
   vehicleOwner,
   selectedReason,
   reasonOptions,
+  tagId,
 }: UseVehicleActionsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -32,32 +34,44 @@ export function useVehicleActions({
     setIsModalOpen(true);
   };
 
-  const handleSendMessage = (
+  const handleSendMessage = async (
     additionalMessage: string,
     phoneNumber: string,
+    reasonId?: string,
   ) => {
-    if (!vehicleOwner) return;
+    if (!vehicleOwner || !tagId) return;
 
+    const finalReasonId = reasonId || selectedReason;
     const selectedReasonLabel =
-      reasonOptions.find((r) => r.id === selectedReason)?.label || "";
+      reasonOptions.find((r) => r.id === finalReasonId)?.label || "";
 
-    let message = `Hi ${vehicleOwner.name}, I need to contact you regarding your vehicle ${vehicleOwner.vehicle_no}.\n\nReason: ${selectedReasonLabel}`;
+    /* 
+       Note: The backend Twilio template currently only supports 'violation' (reason).
+       'additionalMessage' and 'phoneNumber' are not supported by the template yet.
+    */
 
-    if (additionalMessage) {
-      message += `\n\nAdditional Details: ${additionalMessage}`;
+    try {
+      const response = await fetch(`/api/v0/tag/${tagId}/sendMessage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          violation: selectedReasonLabel,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.message || "Failed to send message");
+      }
+
+      return data;
+    } catch (error: any) {
+      console.error("Error sending message:", error);
+      throw error;
     }
-
-    if (phoneNumber) {
-      message += `\n\nYou can reach me at: ${phoneNumber}`;
-    }
-
-    const encodedMessage = encodeURIComponent(message);
-    window.open(
-      `https://wa.me/${vehicleOwner.whatsapp}?text=${encodedMessage}`,
-      "_blank",
-    );
-
-    setIsModalOpen(false);
   };
 
   const handlePrivateCall = () => {

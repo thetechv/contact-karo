@@ -350,7 +350,7 @@ class QrTagService extends Service {
       if (!tagId || !phone) {
         return res.status(400).json({ success: false, message: "tagId and phone are required" });
       }
-
+      console.log("checking...", tagId, phone);
       // Validate ObjectId format
       if (!mongoose.Types.ObjectId.isValid(tagId)) {
         return res.status(400).json({ success: false, message: "Invalid QR tag ID." });
@@ -419,7 +419,7 @@ class QrTagService extends Service {
         emergency_contact_2,
         address,
       } = req.body || {};
-      
+
       if (!tagId) {
         return res.status(400).json({ success: false, message: "tag id is required" });
       }
@@ -500,7 +500,7 @@ class QrTagService extends Service {
       await twilio.sendWhatsappMessage(phone, name, vehicle_no, "Registration");
       return res.status(200).json({ success: true, data: { tag_id: tag._id, user_id: user._id } });
     } catch (err) {
-      try { await session.abortTransaction(); } catch {}
+      try { await session.abortTransaction(); } catch { }
       return res.status(500).json({ success: false, message: err?.message || "Server error" });
     } finally {
       session.endSession();
@@ -523,7 +523,10 @@ class QrTagService extends Service {
       if (!user) {
         return res.status(404).json({ success: false, message: "User not found" });
       }
-      await twilio.sendWhatsappMessage(user.phone, user.name, user.vehicle_no, violation);
+      const contactNumber = user.whatsapp || user.phone;
+      const cleanNumber = contactNumber.toString().replace(/\D/g, "").slice(-10); // get last 10 digits to be safe against +91 prefix
+      console.log(cleanNumber);
+      await twilio.sendWhatsappMessage(cleanNumber, user.name, user.vehicle_no, violation);
       return res.status(200).json({ success: true, message: "Message sent successfully" });
     } catch (err) {
       return res.status(500).json({ success: false, message: err?.message || "Server error" });
