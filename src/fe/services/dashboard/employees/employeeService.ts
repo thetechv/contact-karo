@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { api } from "@/fe/services/api";
+import useQuery from "@/fe/services/useQuery";
 
 // Types
 export interface Employee {
@@ -33,27 +35,31 @@ export const initialEmployeeFormData: EmployeeFormData = {
 
 // Employee list hook service
 export const useEmployees = () => {
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const router = useRouter();
 
-  const loadEmployees = async () => {
-    setLoading(true);
+  const getAllEmployeesWithAuth = useCallback(async () => {
     const result = await api.getAllEmployees();
-    if (result.success && result.data) {
-      setEmployees(result.data as Employee[]);
-    } else {
-      setError(result.message || "Failed to load employees");
+    // Handle auth failure
+    if (!result.success && result.message?.includes("401")) {
+      router.push("/login");
+      throw new Error("Unauthorized");
     }
-    setLoading(false);
-  };
+    return result;
+  }, [router]);
+
+  const { data, isLoading, error, refetch } = useQuery(
+    getAllEmployeesWithAuth,
+    {},
+    "employees-list",
+  );
+
+  const dataAny = data as any;
 
   return {
-    employees,
-    loading,
-    error,
-    loadEmployees,
-    setError,
+    employees: (dataAny?.success ? dataAny.data : []) || [],
+    loading: isLoading,
+    error: error ? String(error) : null,
+    loadEmployees: refetch,
   };
 };
 

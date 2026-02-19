@@ -12,12 +12,14 @@ class ApiService {
     });
 
     if (!response.ok) {
-      const errorData = await response
-        .json()
-        .catch(() => ({ message: "Network error" }));
-      throw new Error(
-        errorData.message || `HTTP error! status: ${response.status}`,
-      );
+      try {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`,
+        );
+      } catch {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
     }
 
     const data = await response.json();
@@ -48,3 +50,5 @@ class ApiService {
 }
 
 export default ApiService;
+
+// (Removed stray test Promise)

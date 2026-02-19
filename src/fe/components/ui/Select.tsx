@@ -21,6 +21,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         )}
         <select
           ref={ref}
+          autoComplete="off"
+          suppressHydrationWarning={true}
           className={cn(
             "w-full px-4 py-3 rounded-lg border transition-all appearance-none cursor-pointer",
             "bg-white dark:bg-gray-900",

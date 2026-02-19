@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "./Button";
 
-
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -56,7 +55,6 @@ export const Pagination: React.FC<PaginationProps> = ({
 
   return (
     <div className="flex flex-col sm:flex-row justify-center items-center gap-6 py-4 px-2 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 text-sm">
-      
       {/* Navigation Controls */}
       <div className="flex items-center gap-2">
         <Button
@@ -70,7 +68,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         </Button>
 
         <span className="text-gray-600 dark:text-gray-300">Page</span>
-        
+
         <input
           type="number"
           min={1}
@@ -80,10 +78,14 @@ export const Pagination: React.FC<PaginationProps> = ({
           onBlur={handlePageSubmit}
           onKeyDown={handleKeyDown}
           disabled={loading}
+          autoComplete="off"
+          suppressHydrationWarning={true}
           className="w-12 h-8 text-center rounded-md border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all disabled:opacity-50"
         />
 
-        <span className="text-gray-600 dark:text-gray-300">of {totalPages}</span>
+        <span className="text-gray-600 dark:text-gray-300">
+          of {totalPages}
+        </span>
 
         <Button
           variant="outline"
@@ -98,13 +100,13 @@ export const Pagination: React.FC<PaginationProps> = ({
 
       {/* Page Size & Total */}
       <div className="flex items-center gap-2">
-        <span className="text-gray-500 dark:text-gray-400">
-          {title}:
-        </span>
+        <span className="text-gray-500 dark:text-gray-400">{title}:</span>
         <select
           value={pageSize}
           onChange={(e) => onPageSizeChange(Number(e.target.value))}
           disabled={loading}
+          autoComplete="off"
+          suppressHydrationWarning={true}
           className="h-8 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 transition-colors disabled:opacity-50"
         >
           {pageSizeOptions.map((size) => (
@@ -119,7 +121,6 @@ export const Pagination: React.FC<PaginationProps> = ({
           </span>
         )}
       </div>
-
     </div>
   );
 };

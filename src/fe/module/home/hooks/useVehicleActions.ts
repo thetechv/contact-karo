@@ -5,14 +5,17 @@ interface UseVehicleActionsProps {
   vehicleOwner: VehicleOwner | null;
   selectedReason: string | null;
   reasonOptions: ReasonOption[];
+  tagId: string;
 }
 
 export function useVehicleActions({
   vehicleOwner,
   selectedReason,
   reasonOptions,
+  tagId,
 }: UseVehicleActionsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
 
   const handleMessage = () => {
     setIsModalOpen(true);
@@ -48,7 +51,29 @@ export function useVehicleActions({
 
   const handlePrivateCall = () => {
     if (!vehicleOwner) return;
-    window.location.href = `tel:${vehicleOwner.phone}`;
+    setIsVerificationModalOpen(true);
+  };
+
+  const handleSetupCall = (lastFourDigits: string, phoneNumber: string) => {
+    if (!vehicleOwner) return;
+
+    // Here we would typically verify the last 4 digits with the backend
+    // The VehicleVerificationModal now handles the actual API call
+    console.log(
+      "Setting up masked call between:",
+      phoneNumber,
+      "and",
+      vehicleOwner.phone,
+    );
+    console.log(
+      "Verifying last 4 digits:",
+      lastFourDigits,
+      "for plate:",
+      vehicleOwner.vehicle_no,
+    );
+
+    // Modal will handle the API call and success state
+    // Don't close the modal here - let the modal handle its own state
   };
 
   const handleDocuments = () => {
@@ -66,9 +91,12 @@ export function useVehicleActions({
   return {
     isModalOpen,
     setIsModalOpen,
+    isVerificationModalOpen,
+    setIsVerificationModalOpen,
     handleMessage,
     handleSendMessage,
     handlePrivateCall,
+    handleSetupCall,
     handleDocuments,
     handleEmergency,
   };

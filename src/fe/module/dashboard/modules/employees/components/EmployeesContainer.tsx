@@ -12,7 +12,10 @@ import { useSharedAuthCheck } from "@/fe/services/auth";
 
 export const EmployeesContainer = () => {
   const { employees, loading, error, loadEmployees } = useEmployees();
-  const { router } = useSharedAuthCheck({ loadData: loadEmployees });
+
+  // Simplified auth check - just get router for logout
+  const { router, handleLogout } = useSharedAuthCheck();
+
   const {
     formData,
     formErrors,

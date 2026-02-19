@@ -21,6 +21,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <input
           ref={ref}
+          autoComplete="off"
+          suppressHydrationWarning={true}
           className={cn(
             "w-full px-4 py-3 rounded-lg border transition-all",
             "bg-white dark:bg-gray-900",

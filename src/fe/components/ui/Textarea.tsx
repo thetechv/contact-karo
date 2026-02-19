@@ -21,6 +21,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         )}
         <textarea
           ref={ref}
+          autoComplete="off"
+          suppressHydrationWarning={true}
           className={cn(
             "w-full px-4 py-3 rounded-lg border transition-all min-h-[100px] resize-y",
             "bg-white dark:bg-gray-900",

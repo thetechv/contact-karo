@@ -66,6 +66,8 @@ export const BatchForm = ({ onSubmit, onSuccess }: BatchFormProps) => {
                   name="name"
                   type="text"
                   placeholder="BATCH001"
+                  autoComplete="off"
+                  suppressHydrationWarning={true}
                   className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all"
                   disabled={formState.isSubmitting}
                 />
@@ -83,6 +85,8 @@ export const BatchForm = ({ onSubmit, onSuccess }: BatchFormProps) => {
                   type="number"
                   min={1}
                   placeholder="100"
+                  autoComplete="off"
+                  suppressHydrationWarning={true}
                   className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all"
                   disabled={formState.isSubmitting}
                 />
@@ -98,6 +102,8 @@ export const BatchForm = ({ onSubmit, onSuccess }: BatchFormProps) => {
                 <Field
                   name="type"
                   as="select"
+                  autoComplete="off"
+                  suppressHydrationWarning={true}
                   className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-all"
                   disabled={formState.isSubmitting}
                 >
@@ -141,6 +147,8 @@ export const BatchForm = ({ onSubmit, onSuccess }: BatchFormProps) => {
                   as="textarea"
                   placeholder="Additional notes..."
                   rows={4}
+                  autoComplete="off"
+                  suppressHydrationWarning={true}
                   className="w-full min-h-[96px] rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 resize-vertical transition-all"
                   disabled={formState.isSubmitting}
                 />
