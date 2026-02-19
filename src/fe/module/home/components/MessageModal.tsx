@@ -16,7 +16,11 @@ interface MessageModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedReason: string | null;
-  onSend: (additionalMessage: string, phoneNumber: string) => void;
+  onSend: (
+    additionalMessage: string,
+    phoneNumber: string,
+    reasonId: string,
+  ) => Promise<any>;
   reasonOptions: Array<{ id: string; icon: string; label: string }>;
 }
 
@@ -41,10 +45,10 @@ export const MessageModal: React.FC<MessageModalProps> = ({
     data: MessageFormData,
   ): Promise<ApiResponse> => {
     try {
-      onSend(data.additionalMessage, data.phoneNumber);
+      await onSend(data.additionalMessage, data.phoneNumber, data.reasonId);
       return {
         success: true,
-        message: "Message sent successfully",
+        message: "WhatsApp message sent successfully!",
       };
     } catch (error: any) {
       return {
@@ -55,7 +59,10 @@ export const MessageModal: React.FC<MessageModalProps> = ({
   };
 
   const handleSuccess = () => {
-    onClose();
+    // Small delay to let user see the success message
+    setTimeout(() => {
+      onClose();
+    }, 2000);
   };
 
   return (

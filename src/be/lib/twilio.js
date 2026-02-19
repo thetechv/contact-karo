@@ -21,13 +21,14 @@ class Twilio {
     const message = await this.client.messages.create({
       body,
       from: this.phoneNumber,
-      to :`+91${to}`,
+      to: `+91${to}`,
     });
-    console.log("Message:",message);
+    console.log("Message:", message);
   }
 
   async sendWhatsappMessage(to, name, vehicle_no, violation) {
-    try{
+    try {
+      console.log("sending whatsapp message to", to, name, vehicle_no, violation);
       await this.client.messages.create({
         from: this.whatsappNumber,
         to: `whatsapp:+91${to}`,

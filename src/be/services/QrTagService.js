@@ -21,6 +21,9 @@ class QrTagService extends Service {
     return req?.query?.qr_id || req?.params?.qr_id;
   }
 
+
+
+
   async createTag(req, res) {
     try {
       await dbConnect();
@@ -91,16 +94,68 @@ class QrTagService extends Service {
     try {
       await dbConnect();
       const id = this.getId(req);
-      if (!id) return res.status(400).json({ success: false, message: "id is required" });
 
-      const tag = await QrTag.findById(id).populate("batch_ref").populate("user_id").lean();
-      if (!tag) return res.status(404).json({ success: false, message: "Tag not found" });
+      if (!id)
+        return res.status(400).json({
+          success: false,
+          message: "id is required",
+        });
 
-      return res.status(200).json({ success: true, data: tag });
+      const tag = await QrTag.findById(id)
+        .select("-otp")   // 👈 exclude otp
+        .populate("user_id")
+        .lean();
+
+      if (!tag)
+        return res.status(404).json({
+          success: false,
+          message: "Tag not found",
+        });
+
+      // ✅ Mask user details
+      if (tag.user_id) {
+
+        const maskPhone = (phone) => {
+          if (!phone) return phone;
+
+          const visibleDigits = 2;
+          const maskedLength = phone.length - visibleDigits;
+
+          return "*".repeat(maskedLength) + phone.slice(-2);
+        };
+
+
+        const maskEmail = (email) => {
+          if (!email) return email;
+          const [name, domain] = email.split("@");
+          return name.slice(0, 2) + "****@" + domain;
+        };
+
+
+        tag.user_id.phone = maskPhone(tag.user_id.phone);
+        tag.user_id.whatsapp = maskPhone(tag.user_id.whatsapp);
+        tag.user_id.emergency_contact_1 = maskPhone(tag.user_id.emergency_contact_1);
+        tag.user_id.emergency_contact_2 = maskPhone(tag.user_id.emergency_contact_2);
+        tag.user_id.email = maskEmail(tag.user_id.email);
+        if (tag.user_id.address) {
+          tag.user_id.address = tag.user_id.address.substring(0, 4) + "**";
+        }
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "details fetched successfully",
+        data: tag,
+      });
+
     } catch (err) {
-      return res.status(500).json({ success: false, message: err?.message || "Server error" });
+      return res.status(500).json({
+        success: false,
+        message: err?.message || "Server error",
+      });
     }
   }
+
 
   async getTagByQrId(req, res) {
     try {
@@ -350,7 +405,7 @@ class QrTagService extends Service {
       if (!tagId || !phone) {
         return res.status(400).json({ success: false, message: "tagId and phone are required" });
       }
-
+      console.log("checking...", tagId, phone);
       // Validate ObjectId format
       if (!mongoose.Types.ObjectId.isValid(tagId)) {
         return res.status(400).json({ success: false, message: "Invalid QR tag ID." });
@@ -419,7 +474,7 @@ class QrTagService extends Service {
         emergency_contact_2,
         address,
       } = req.body || {};
-      
+
       if (!tagId) {
         return res.status(400).json({ success: false, message: "tag id is required" });
       }
@@ -500,7 +555,7 @@ class QrTagService extends Service {
       await twilio.sendWhatsappMessage(phone, name, vehicle_no, "Registration");
       return res.status(200).json({ success: true, data: { tag_id: tag._id, user_id: user._id } });
     } catch (err) {
-      try { await session.abortTransaction(); } catch {}
+      try { await session.abortTransaction(); } catch { }
       return res.status(500).json({ success: false, message: err?.message || "Server error" });
     } finally {
       session.endSession();
@@ -523,7 +578,10 @@ class QrTagService extends Service {
       if (!user) {
         return res.status(404).json({ success: false, message: "User not found" });
       }
-      await twilio.sendWhatsappMessage(user.phone, user.name, user.vehicle_no, violation);
+      const contactNumber = user.whatsapp || user.phone;
+      const cleanNumber = contactNumber.toString().replace(/\D/g, "").slice(-10); // get last 10 digits to be safe against +91 prefix
+      console.log(cleanNumber);
+      await twilio.sendWhatsappMessage(cleanNumber, user.name, user.vehicle_no, violation);
       return res.status(200).json({ success: true, message: "Message sent successfully" });
     } catch (err) {
       return res.status(500).json({ success: false, message: err?.message || "Server error" });
