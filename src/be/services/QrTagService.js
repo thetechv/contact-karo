@@ -2,6 +2,7 @@ import { Service } from "../framework/service";
 import dbConnect from "../lib/mongodb";
 import QrTag from "../models/QrTag";
 import QrBatch from "../models/QrBatch";
+import Call from "../models/Call"
 import User from "../models/User";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
@@ -587,6 +588,38 @@ class QrTagService extends Service {
       return res.status(500).json({ success: false, message: err?.message || "Server error" });
     }
   }
+
+  async call(req, res) {
+    try {
+      const tagId = this.getId(req);
+      const callerPhone = req.body.phone;
+      const tag = await QrTag.findById(tagId).lean();
+      if (!tag) {
+        return res.status(404).json({ success: false, message: "Tag not found" });
+      }
+      if (tag.status !== "active" || !tag.user_id) {
+        return res.status(400).json({ success: false, message: "Tag is not active or not assigned" });
+      }
+
+      const call = await Call.create({
+        tagID: tag._id,
+        phone: callerPhone,
+      });
+
+      const user = await User.findById(tag.user_id).lean();
+      if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+      const contactNumber = user.phone;
+      const cleanNumber = contactNumber.toString().replace(/\D/g, "").slice(-10); // get last 10 digits to be safe against +91 prefix
+      console.log(cleanNumber);
+      // await twilio.call(cleanNumber);
+      return res.status(200).json({ success: true, message: "Call sent successfully", data: cleanNumber });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: err?.message || "Server error" });
+    }
+  }
+
 }
 
 export default QrTagService;

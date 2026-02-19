@@ -3,7 +3,7 @@ const { Schema, model, models, Types } = mongoose;
 
 const QrTagSchema = new Schema(
   {
-    
+
     type: { type: String, required: false },
 
     // Only reference to batch
