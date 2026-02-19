@@ -53,8 +53,10 @@ export const useEmployees = () => {
     "employees-list",
   );
 
+  const dataAny = data as any;
+
   return {
-    employees: (data?.success ? data.data : []) || [],
+    employees: (dataAny?.success ? dataAny.data : []) || [],
     loading: isLoading,
     error: error ? String(error) : null,
     loadEmployees: refetch,
