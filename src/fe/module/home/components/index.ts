@@ -2,6 +2,7 @@ export { VehicleInfo } from "./VehicleInfo";
 export { ReasonSelector } from "./ReasonSelector";
 export { ActionButtons } from "./ActionButtons";
 export { MessageModal } from "./MessageModal";
+export { VehicleVerificationModal } from "./VehicleVerificationModal";
 export { OwnerLoginSection } from "./OwnerLoginSection";
 export { OwnerLoginModal } from "./OwnerLoginModal";
 export { OwnerLoginFlow } from "./OwnerLoginFlow";

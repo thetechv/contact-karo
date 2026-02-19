@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { api } from "@/fe/services/api";
+import useQuery from "@/fe/services/useQuery";
 
 // Types
 export interface Employee {
@@ -33,27 +34,17 @@ export const initialEmployeeFormData: EmployeeFormData = {
 
 // Employee list hook service
 export const useEmployees = () => {
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  const loadEmployees = async () => {
-    setLoading(true);
-    const result = await api.getAllEmployees();
-    if (result.success && result.data) {
-      setEmployees(result.data as Employee[]);
-    } else {
-      setError(result.message || "Failed to load employees");
-    }
-    setLoading(false);
-  };
+  const { data, isLoading, error, refetch } = useQuery(
+    () => api.getAllEmployees(),
+    {},
+    "employees-list",
+  );
 
   return {
-    employees,
-    loading,
-    error,
-    loadEmployees,
-    setError,
+    employees: (data?.success ? data.data : []) || [],
+    loading: isLoading,
+    error: error ? String(error) : null,
+    loadEmployees: refetch,
   };
 };
 

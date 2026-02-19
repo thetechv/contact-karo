@@ -6,6 +6,7 @@ import {
   ReasonSelector,
   ActionButtons,
   MessageModal,
+  VehicleVerificationModal,
   OwnerLoginSection,
   OwnerLoginFlow,
   EmptyState,
@@ -33,9 +34,12 @@ export function TagPage() {
   const {
     isModalOpen,
     setIsModalOpen,
+    isVerificationModalOpen,
+    setIsVerificationModalOpen,
     handleMessage,
     handleSendMessage,
     handlePrivateCall,
+    handleSetupCall,
     handleEmergency,
   } = useVehicleActions({
     vehicleOwner,
@@ -133,6 +137,13 @@ export function TagPage() {
             selectedReason={selectedReason}
             onSend={handleSendMessage}
             reasonOptions={currentReasonOptions}
+          />
+
+          <VehicleVerificationModal
+            isOpen={isVerificationModalOpen}
+            onClose={() => setIsVerificationModalOpen(false)}
+            plateNumber={vehicleOwner?.vehicle_no || ""}
+            onSetupCall={handleSetupCall}
           />
 
           <OwnerLoginFlow
