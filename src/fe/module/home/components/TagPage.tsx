@@ -143,6 +143,7 @@ export function TagPage() {
             isOpen={isVerificationModalOpen}
             onClose={() => setIsVerificationModalOpen(false)}
             plateNumber={vehicleOwner?.vehicle_no || ""}
+            tagId={id || ""}
             onSetupCall={handleSetupCall}
           />
 

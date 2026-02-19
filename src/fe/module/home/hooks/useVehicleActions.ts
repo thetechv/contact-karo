@@ -58,9 +58,7 @@ export function useVehicleActions({
     if (!vehicleOwner) return;
 
     // Here we would typically verify the last 4 digits with the backend
-    // For now, we'll setup the masked call
-
-    // You can implement the masked call API integration here
+    // The VehicleVerificationModal now handles the actual API call
     console.log(
       "Setting up masked call between:",
       phoneNumber,
@@ -74,12 +72,8 @@ export function useVehicleActions({
       vehicleOwner.vehicle_no,
     );
 
-    // For now, just show an alert - replace this with actual API call
-    alert(
-      `Setting up masked call between ${phoneNumber} and vehicle owner for plate ${vehicleOwner.vehicle_no}`,
-    );
-
-    setIsVerificationModalOpen(false);
+    // Modal will handle the API call and success state
+    // Don't close the modal here - let the modal handle its own state
   };
 
   const handleDocuments = () => {
