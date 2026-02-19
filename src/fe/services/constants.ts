@@ -35,29 +35,29 @@ export const carReasonOptions: ReasonOption[] = [
 
 export const bikeReasonOptions: ReasonOption[] = [
   {
-    id: "lights-on",
-    icon: "☀️",
-    label: "The lights of this bike is on.",
-  },
-  {
     id: "no-parking",
+    icon: "🚫",
+    label: "Parked in a No-Parking / Tow Zone.",
+  },
+  {
+    id: "blocking-way",
+    icon: "🚧",
+    label: "Blocking a driveway or entrance.",
+  },
+  {
+    id: "fallen-over",
+    icon: "🏍️",
+    label: "Your bike has fallen over.",
+  },
+  {
+    id: "leaning-badly",
     icon: "⚠️",
-    label: "The bike is in no parking.",
+    label: "Your bike is about to fall over.",
   },
   {
-    id: "getting-towed",
-    icon: "🛵",
-    label: "The bike is getting towed.",
-  },
-  {
-    id: "key-in-ignition",
+    id: "key-left",
     icon: "🔑",
-    label: "Key is left in the bike.",
-  },
-  {
-    id: "something-wrong",
-    icon: "⚠️",
-    label: "Something wrong with this bike.",
+    label: "Keys left in the bike/ignition.",
   },
 ];
 
@@ -155,7 +155,9 @@ export const businessCardReasonOptions: ReasonOption[] = [
   },
 ];
 
-export const getReasonOptions = (vehicleType: string = "car"): ReasonOption[] => {
+export const getReasonOptions = (
+  vehicleType: string = "car",
+): ReasonOption[] => {
   const type = vehicleType.toLowerCase();
 
   if (type === "bike" || type === "scooter" || type === "motorcycle") {
