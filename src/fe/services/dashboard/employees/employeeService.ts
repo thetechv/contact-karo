@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { api } from "@/fe/services/api";
 import useQuery from "@/fe/services/useQuery";
 
@@ -34,8 +35,20 @@ export const initialEmployeeFormData: EmployeeFormData = {
 
 // Employee list hook service
 export const useEmployees = () => {
+  const router = useRouter();
+
+  const getAllEmployeesWithAuth = useCallback(async () => {
+    const result = await api.getAllEmployees();
+    // Handle auth failure
+    if (!result.success && result.message?.includes("401")) {
+      router.push("/login");
+      throw new Error("Unauthorized");
+    }
+    return result;
+  }, [router]);
+
   const { data, isLoading, error, refetch } = useQuery(
-    () => api.getAllEmployees(),
+    getAllEmployeesWithAuth,
     {},
     "employees-list",
   );

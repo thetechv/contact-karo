@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  type FormEvent,
+} from "react";
 import { useRouter } from "next/navigation";
 
 // Authentication check hook service for dashboard
@@ -50,38 +56,19 @@ interface UseSharedAuthCheckProps {
 
 export const useSharedAuthCheck = (props?: UseSharedAuthCheckProps) => {
   const router = useRouter();
-  const { loadData, onAuthSuccess } = props || {};
 
-  useEffect(() => {
-    checkAuthAndLoad();
-  }, []);
-
-  const checkAuthAndLoad = async () => {
-    try {
-      const res = await fetch("/api/v0/employee", { method: "GET" });
-      if (res.status === 401) {
-        router.push("/login");
-        return;
-      }
-
-      // Call success callbacks
-      onAuthSuccess?.();
-      await loadData?.();
-    } catch (err) {
-      router.push("/login");
-    }
-  };
-
-  const handleLogout = async () => {
+  // Simplified - no auto data loading or auth checking
+  // Let individual hooks handle their own auth
+  const handleLogout = useCallback(async () => {
     try {
       await fetch("/api/v0/employee/logout", { method: "POST" });
     } catch (err) {
       // ignore
     }
     router.push("/login");
-  };
+  }, [router]);
 
-  return { router, handleLogout, checkAuthAndLoad };
+  return { router, handleLogout };
 };
 
 // Login hook service
