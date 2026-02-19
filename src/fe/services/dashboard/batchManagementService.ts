@@ -1,15 +1,22 @@
 "use client";
 
-import { useState, useMemo, useCallback, type ChangeEvent, type FormEvent } from "react";
+import {
+  useState,
+  useMemo,
+  useCallback,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 
 // Types
 export interface Batch {
   _id: string;
   batch_id: string;
   qty: number;
+  type: "car" | "bike" | "bag-tag" | "door-tag" | "business-card";
   note?: string;
-  created_at: string;
   status?: string;
+  createdAt?: string;
 }
 
 export interface BatchFormState {
@@ -37,52 +44,61 @@ export const useBatches = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const loadBatches = useCallback(async (params: any = {}) => {
-    try {
-      setErrorMessage("");
-      setIsLoading(true);
-      const { page = pagination.page, limit = pagination.limit } = params;
+  const loadBatches = useCallback(
+    async (params: any = {}) => {
+      try {
+        setErrorMessage("");
+        setIsLoading(true);
+        const { page = pagination.page, limit = pagination.limit } = params;
 
-      const queryParams = new URLSearchParams({
-        page: page.toString(),
-        limit: limit.toString(),
-      });
-
-      const response = await fetch(`/api/v0/batch?${queryParams}`);
-      const payload = await response.json();
-      if (!response.ok || !payload?.success) {
-        throw new Error(payload?.message || "Unable to load batches.");
-      }
-      setBatches(payload?.data || []);
-
-      if (payload.pagination) {
-        setPagination({
-          page: payload.pagination.page,
-          limit: payload.pagination.limit,
-          total: payload.pagination.total,
-          totalPages: payload.pagination.totalPages,
+        const queryParams = new URLSearchParams({
+          page: page.toString(),
+          limit: limit.toString(),
         });
+
+        const response = await fetch(`/api/v0/batch?${queryParams}`);
+        const payload = await response.json();
+        if (!response.ok || !payload?.success) {
+          throw new Error(payload?.message || "Unable to load batches.");
+        }
+        setBatches(payload?.data || []);
+
+        if (payload.pagination) {
+          setPagination({
+            page: payload.pagination.page,
+            limit: payload.pagination.limit,
+            total: payload.pagination.total,
+            totalPages: payload.pagination.totalPages,
+          });
+        }
+
+        if (payload.stats) {
+          setStats(payload.stats);
+        }
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Failed to load batches.";
+        setErrorMessage(message);
+      } finally {
+        setIsLoading(false);
       }
+    },
+    [pagination.page, pagination.limit],
+  );
 
-      if (payload.stats) {
-        setStats(payload.stats);
-      }
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to load batches.";
-      setErrorMessage(message);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [pagination.page, pagination.limit]);
+  const setPage = useCallback(
+    (page: number) => {
+      loadBatches({ page });
+    },
+    [loadBatches],
+  );
 
-  const setPage = useCallback((page: number) => {
-    loadBatches({ page });
-  }, [loadBatches]);
-
-  const setLimit = useCallback((limit: number) => {
-    loadBatches({ limit, page: 1 });
-  }, [loadBatches]);
+  const setLimit = useCallback(
+    (limit: number) => {
+      loadBatches({ limit, page: 1 });
+    },
+    [loadBatches],
+  );
 
   return {
     batches,

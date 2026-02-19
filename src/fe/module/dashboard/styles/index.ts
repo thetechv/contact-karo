@@ -1,5 +1,8 @@
 // Dashboard-specific styles can be added here if needed
 // Currently using Tailwind classes directly in components
+// Print styles are defined in print-sticker.ts
+
+export * from "./print-sticker";
 
 export const dashboardStyles = {
   container: "mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-10",
