@@ -666,6 +666,7 @@ class QrTagService extends Service {
 
   async call(req, res) {
     try {
+      await dbConnect();
       const tagId = this.getId(req);
       const callerPhone = req.body.phone;
 
@@ -692,11 +693,6 @@ class QrTagService extends Service {
         });
       }
 
-      await Call.create({
-        tagID: tag._id,
-        phone: callerPhone,
-      });
-
       const user = await User.findById(tag.user_id).lean();
 
       if (!user) {
@@ -706,25 +702,25 @@ class QrTagService extends Service {
         });
       }
 
-      const ownerPhone = user.phone?.toString().replace(/\D/g, "").slice(-10);
-      const callerClean = callerPhone?.toString().replace(/\D/g, "").slice(-10);
+      const ownerPhoneNum = user.phone?.toString().replace(/\D/g, "").slice(-10);
+      const callerCleanNum = callerPhone?.toString().replace(/\D/g, "").slice(-10);
 
-      if (!ownerPhone || ownerPhone.length !== 10) {
+      if (!ownerPhoneNum || ownerPhoneNum.length !== 10) {
         return res.status(400).json({
           success: false,
           message: "Owner phone number is invalid",
         });
       }
 
-      if (!callerClean || callerClean.length !== 10) {
+      if (!callerCleanNum || callerCleanNum.length !== 10) {
         return res.status(400).json({
           success: false,
           message: "Caller phone number is invalid",
         });
       }
 
-      const agentNumber = `+91${ownerPhone}`;      // tag owner
-      const customerNumber = `+91${callerClean}`;  // scanner / caller
+      const agentNumber = `+91${ownerPhoneNum}`;      // tag owner
+      const customerNumber = `+91${callerCleanNum}`;  // scanner / caller
 
       const twilioCall = await twilio.bridgeCall(
         agentNumber,
@@ -732,14 +728,19 @@ class QrTagService extends Service {
         tagId
       );
 
+      // Save call info in DB
+      await Call.create({
+        tagID: tag._id,
+        callerPhone: customerNumber,
+        ownerPhone: agentNumber,
+        callSid: twilioCall.sid,
+        status: "initiated"
+      });
+
       return res.status(200).json({
         success: true,
         message: "Call initiated successfully",
-        data: {
-          sid: twilioCall.sid,
-          ownerPhone: agentNumber,
-          callerPhone: customerNumber,
-        },
+        data: agentNumber
       });
     } catch (err) {
       console.error("QrTagService.call error:", err);
