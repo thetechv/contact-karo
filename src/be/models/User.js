@@ -26,7 +26,6 @@ const userSchema = new mongoose.Schema(
       required: false,
       lowercase: true,
       trim: true,
-      required: [true, "Email is required"],
       sparse: true,
     },
 

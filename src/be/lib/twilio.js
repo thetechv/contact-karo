@@ -43,6 +43,48 @@ class Twilio {
       console.error("Error sending WhatsApp message:", error);
     }
   }
+  async makeTestCall(to) {
+    try {
+      const call = await this.client.calls.create({
+        to,
+        from: this.phoneNumber,
+        url: "http://demo.twilio.com/docs/voice.xml",
+      });
+
+      console.log("Test call:", call.sid);
+      return call;
+    } catch (error) {
+      console.error("Error making test call:", error);
+      throw error;
+    }
+  }
+
+  async bridgeCall(agentNumber, customerNumber, tagId) {
+    try {
+      const baseUrl = process.env.BASE_URL;
+
+      if (!baseUrl) {
+        throw new Error("BASE_URL is not configured");
+      }
+
+      const url =
+        `${baseUrl}/api/v0/tag/connect-customer` +
+        `?customer=${encodeURIComponent(customerNumber)}` +
+        `&tagId=${encodeURIComponent(tagId)}`;
+
+      const call = await this.client.calls.create({
+        to: agentNumber,
+        from: this.phoneNumber,
+        url,
+      });
+
+      console.log("Bridge call started:", call.sid);
+      return call;
+    } catch (error) {
+      console.error("Error starting bridge call:", error);
+      throw error;
+    }
+  }
 }
 
 const twilio = new Twilio();
