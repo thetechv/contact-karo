@@ -215,95 +215,77 @@ export const VehicleVerificationModal: React.FC<
             </>
           ) : (
             /* Success State - Call Setup Complete */
-            <div className="space-y-6">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg
-                    className="w-8 h-8 text-green-600 dark:text-green-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
+            <div className="space-y-8 animate-in fade-in zoom-in duration-500">
+              <div className="text-center relative py-4">
+                {/* Pulsing Outgoing Call Animation */}
+                <div className="relative w-24 h-24 mx-auto mb-6">
+                  <div className="absolute inset-0 bg-blue-400 rounded-full animate-ping opacity-20"></div>
+                  <div className="absolute inset-2 bg-blue-500 rounded-full animate-pulse opacity-40"></div>
+                  <div className="relative flex items-center justify-center w-24 h-24 bg-blue-600 rounded-full shadow-lg shadow-blue-500/30">
+                    <svg
+                      className="w-10 h-10 text-white animate-bounce"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                      />
+                    </svg>
+                  </div>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                  Masked Call Setup Successful!
+
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3 tracking-tight">
+                  Connecting Your Call...
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  You can now contact the owner
+                <p className="text-gray-600 dark:text-gray-400 max-w-xs mx-auto leading-relaxed">
+                  Our system is bridging a secure, masked call between you and the vehicle owner.
                 </p>
               </div>
 
-              {/* Contact Information */}
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-3">
-                  Contact Details
-                </h4>
-                <div className="space-y-2">
+              {/* Status Message Box */}
+              <div className="bg-blue-50/80 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/50 rounded-2xl p-6 text-center shadow-sm">
+                <div className="flex flex-col items-center gap-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-blue-700 dark:text-blue-300 font-medium">
-                      Vehicle Owner:
+                    <span className="relative flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
                     </span>
-                    <span className="text-blue-900 dark:text-blue-100 font-bold">
-                      {contactNumber}
+                    <span className="text-sm font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-wider">
+                      Please wait for incoming call
                     </span>
                   </div>
+                  <p className="text-gray-700 dark:text-gray-300">
+                    You will receive an incoming call on{" "}
+                    <span className="font-bold text-gray-900 dark:text-gray-100">
+                      {phoneNumber}
+                    </span>{" "}
+                    in a few seconds.
+                  </p>
                 </div>
               </div>
 
-              {/* Call Button */}
-              <div className="space-y-4">
-                <Button
-                  onClick={() => window.open(`tel:${contactNumber}`)}
-                  className="w-full py-4 text-lg font-semibold bg-green-600 hover:bg-green-700"
-                  size="lg"
-                >
-                  📞 Call Now
-                </Button>
-
-                {/* Warning/Instructions */}
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="text-yellow-600 dark:text-yellow-400 mt-0.5">
-                      <svg
-                        className="w-5 h-5"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <div className="space-y-2">
-                      <h5 className="font-medium text-yellow-800 dark:text-yellow-200">
-                        Important Guidelines:
-                      </h5>
-                      <ul className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
-                        <li>
-                          • This call is for legitimate vehicle-related
-                          emergencies only
-                        </li>
-                        <li>
-                          • Do not use this service for testing or non-emergency
-                          purposes
-                        </li>
-                        <li>
-                          • Your number may be logged for security purposes
-                        </li>
-                        <li>• Be respectful and courteous when calling</li>
-                      </ul>
-                    </div>
+              {/* Instructions Callout */}
+              <div className="bg-yellow-50/50 dark:bg-yellow-900/10 border border-yellow-100/50 dark:border-yellow-800/30 rounded-xl p-4">
+                <div className="flex gap-3">
+                  <div className="text-yellow-600 dark:text-yellow-500 shrink-0 mt-0.5">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
                   </div>
+                  <p className="text-sm text-yellow-800 dark:text-yellow-200/80 leading-snug">
+                    <span className="font-semibold text-yellow-900 dark:text-yellow-100 block mb-1">Stay on this screen.</span>
+                    Please keep your line free and answer the incoming call to speak with the owner.
+                  </p>
                 </div>
+              </div>
+
+              {/* Fallback Action */}
+              <div className="pt-2 text-center text-xs text-gray-500 dark:text-gray-500">
+                If the call doesn't connect within 60 seconds, please try again.
               </div>
             </div>
           )}
