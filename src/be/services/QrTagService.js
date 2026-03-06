@@ -96,59 +96,71 @@ class QrTagService extends Service {
       await dbConnect();
       const id = this.getId(req);
 
-      if (!id)
-        return res.status(400).json({
-          success: false,
-          message: "id is required",
-        });
+      if (!id) {
+        return res.status(400).json({ success: false, message: "id is required" });
+      }
 
-      const tag = await QrTag.findById(id)
-        .select("-otp")   // 👈 exclude otp
-        .populate("user_id")
-        .lean();
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ success: false, message: "Invalid tag id" });
+      }
 
-      if (!tag)
-        return res.status(404).json({
-          success: false,
-          message: "Tag not found",
-        });
+      // 1) fetch tag (no otp)
+      const tag = await QrTag.findById(id).select("-otp").lean();
+      if (!tag) {
+        return res.status(404).json({ success: false, message: "Tag not found" });
+      }
 
-      // ✅ Mask user details
+      // helper mask functions
+      const maskPhone = (value) => {
+        if (!value) return value;
+        const s = String(value);
+        const last2 = s.slice(-2);
+        // keep only last 2 visible, mask rest
+        return "*".repeat(Math.max(0, s.length - 2)) + last2;
+      };
+
+      const maskEmail = (value) => {
+        if (!value) return value;
+        const s = String(value);
+        const at = s.indexOf("@");
+        if (at === -1) return "**"; // invalid email fallback
+        const name = s.slice(0, at);
+        const domain = s.slice(at + 1);
+        return name.slice(0, 2) + "****@" + domain;
+      };
+
+      const maskAddress = (value) => {
+        if (!value) return value;
+        const s = String(value);
+        if (s.length <= 4) return "****";
+        return s.slice(0, 4) + "**";
+      };
+
+      // 2) fetch user only if tag has user_id
+      let user = null;
       if (tag.user_id) {
+        user = await User.findById(tag.user_id)
+          .select("name phone whatsapp email vehicle_no emergency_contact_1 emergency_contact_2 address")
+          .lean();
 
-        const maskPhone = (phone) => {
-          if (!phone) return phone;
-
-          const visibleDigits = 2;
-          const maskedLength = phone.length - visibleDigits;
-
-          return "*".repeat(maskedLength) + phone.slice(-2);
-        };
-
-
-        const maskEmail = (email) => {
-          if (!email) return email;
-          const [name, domain] = email.split("@");
-          return name.slice(0, 2) + "****@" + domain;
-        };
-
-
-        tag.user_id.phone = maskPhone(tag.user_id.phone);
-        tag.user_id.whatsapp = maskPhone(tag.user_id.whatsapp);
-        tag.user_id.emergency_contact_1 = maskPhone(tag.user_id.emergency_contact_1);
-        tag.user_id.emergency_contact_2 = maskPhone(tag.user_id.emergency_contact_2);
-        tag.user_id.email = maskEmail(tag.user_id.email);
-        if (tag.user_id.address) {
-          tag.user_id.address = tag.user_id.address.substring(0, 4) + "**";
+        if (user) {
+          user.phone = maskPhone(user.phone);
+          user.whatsapp = maskPhone(user.whatsapp);
+          user.emergency_contact_1 = maskPhone(user.emergency_contact_1);
+          user.emergency_contact_2 = maskPhone(user.emergency_contact_2);
+          user.email = maskEmail(user.email);
+          user.address = maskAddress(user.address);
         }
       }
+
+      // attach masked user (same response shape as populate)
+      const data = { ...tag, user_id: user };
 
       return res.status(200).json({
         success: true,
         message: "details fetched successfully",
-        data: tag,
+        data,
       });
-
     } catch (err) {
       return res.status(500).json({
         success: false,
@@ -462,8 +474,10 @@ class QrTagService extends Service {
   async activateQr(req, res) {
     await dbConnect();
     const session = await mongoose.startSession();
+
     try {
       const tagId = this.getId(req);
+
       let {
         otp,
         name,
@@ -476,11 +490,13 @@ class QrTagService extends Service {
         address,
       } = req.body || {};
 
+      // -------------------------------
+      // Basic validations
+      // -------------------------------
       if (!tagId) {
         return res.status(400).json({ success: false, message: "tag id is required" });
       }
 
-      // Validate ObjectId format
       if (!mongoose.Types.ObjectId.isValid(tagId)) {
         return res.status(400).json({ success: false, message: "Invalid QR tag ID." });
       }
@@ -489,35 +505,44 @@ class QrTagService extends Service {
         return res.status(400).json({ success: false, message: "otp is required" });
       }
 
-      await User.createCollection();
       session.startTransaction();
 
-      const tag = await QrTag.findById(tagId).session(session);
+      // -------------------------------
+      // Load tag inside transaction
+      // -------------------------------
+      const tag = await QrTag.findById(tagId)
+        .select("status user_id otp")
+        .session(session);
+
       if (!tag) {
         await session.abortTransaction();
         return res.status(404).json({ success: false, message: "QR not found" });
       }
-      console.log("Tag found:", tag);
-      // If phone not provided during activation, use the phone saved with the OTP
-      if (!phone) phone = tag.otp?.phone;
+
+      // fallback phone from OTP record if not passed
+      if (!phone) phone = tag?.otp?.phone;
 
       if (!name || !phone || !email || !vehicle_no || !emergency_contact_1) {
         await session.abortTransaction();
-        return res.status(400).json({ success: false, message: "name, phone, email, vehicle_no, emergency_contact_1 are required" });
+        return res.status(400).json({
+          success: false,
+          message: "name, phone, email, vehicle_no, emergency_contact_1 are required",
+        });
       }
-      // Check if OTP exists
+
+      // -------------------------------
+      // OTP validations
+      // -------------------------------
       if (!tag.otp?.code) {
         await session.abortTransaction();
         return res.status(400).json({ success: false, message: "OTP not sent for this tag" });
       }
 
-      // Check if OTP is expired
       if (new Date() > new Date(tag.otp.expires_at)) {
         await session.abortTransaction();
         return res.status(400).json({ success: false, message: "OTP has expired" });
       }
 
-      // Check if OTP matches
       if (tag.otp.code !== otp.toString()) {
         await session.abortTransaction();
         return res.status(400).json({ success: false, message: "Invalid OTP" });
@@ -525,9 +550,15 @@ class QrTagService extends Service {
 
       if (tag.status !== "unassigned" || tag.user_id) {
         await session.abortTransaction();
-        return res.status(409).json({ success: false, message: "QR already assigned or not available" });
+        return res.status(409).json({
+          success: false,
+          message: "QR already assigned or not available",
+        });
       }
 
+      // -------------------------------
+      // Create User
+      // -------------------------------
       const [user] = await User.create(
         [
           {
@@ -544,20 +575,64 @@ class QrTagService extends Service {
         { session }
       );
 
-      tag.user_id = user._id;
-      tag.status = "active";
-      tag.otp = {}; // Clear OTP after successful activation
-      await tag.save({ session });
+      // -------------------------------
+      // Assign tag to user (atomic update)
+      // -------------------------------
+      const updateResult = await QrTag.updateOne(
+        {
+          _id: tag._id,
+          status: "unassigned",
+          user_id: { $in: [null, undefined] },
+        },
+        {
+          $set: {
+            user_id: user._id,
+            status: "active",
+            otp: {},
+          },
+        },
+        { session }
+      );
 
-      user.qr_tag_id = tag._id;
-      await user.save({ session });
+      if (updateResult.modifiedCount === 0) {
+        // if somehow race condition happened
+        await session.abortTransaction();
+        return res.status(409).json({
+          success: false,
+          message: "QR already assigned",
+        });
+      }
 
+      // -------------------------------
+      // Commit Transaction
+      // -------------------------------
       await session.commitTransaction();
-      await twilio.sendWhatsappMessage(phone, name, vehicle_no, "Registration");
-      return res.status(200).json({ success: true, data: { tag_id: tag._id, user_id: user._id } });
+
+      // Respond FAST
+      res.status(200).json({
+        success: true,
+        data: {
+          tag_id: tag._id,
+          user_id: user._id,
+        },
+      });
+
+      // -------------------------------
+      // Send WhatsApp (async, non-blocking)
+      // -------------------------------
+      twilio
+        .sendWhatsappMessage(phone, name, vehicle_no, "Registration")
+        .catch((err) => console.error("WhatsApp send failed:", err));
+
     } catch (err) {
-      try { await session.abortTransaction(); } catch { }
-      return res.status(500).json({ success: false, message: err?.message || "Server error" });
+      try {
+        await session.abortTransaction();
+      } catch { }
+
+      return res.status(500).json({
+        success: false,
+        message: err?.message || "Server error",
+      });
     } finally {
       session.endSession();
     }
@@ -593,30 +668,86 @@ class QrTagService extends Service {
     try {
       const tagId = this.getId(req);
       const callerPhone = req.body.phone;
-      const tag = await QrTag.findById(tagId).lean();
-      if (!tag) {
-        return res.status(404).json({ success: false, message: "Tag not found" });
-      }
-      if (tag.status !== "active" || !tag.user_id) {
-        return res.status(400).json({ success: false, message: "Tag is not active or not assigned" });
+
+      if (!callerPhone) {
+        return res.status(400).json({
+          success: false,
+          message: "Caller phone is required",
+        });
       }
 
-      const call = await Call.create({
+      const tag = await QrTag.findById(tagId).lean();
+
+      if (!tag) {
+        return res.status(404).json({
+          success: false,
+          message: "Tag not found",
+        });
+      }
+
+      if (tag.status !== "active" || !tag.user_id) {
+        return res.status(400).json({
+          success: false,
+          message: "Tag is not active or not assigned",
+        });
+      }
+
+      await Call.create({
         tagID: tag._id,
         phone: callerPhone,
       });
 
       const user = await User.findById(tag.user_id).lean();
+
       if (!user) {
-        return res.status(404).json({ success: false, message: "User not found" });
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
       }
-      const contactNumber = user.phone;
-      const cleanNumber = contactNumber.toString().replace(/\D/g, "").slice(-10); // get last 10 digits to be safe against +91 prefix
-      console.log(cleanNumber);
-      // await twilio.call(cleanNumber);
-      return res.status(200).json({ success: true, message: "Call sent successfully", data: cleanNumber });
+
+      const ownerPhone = user.phone?.toString().replace(/\D/g, "").slice(-10);
+      const callerClean = callerPhone?.toString().replace(/\D/g, "").slice(-10);
+
+      if (!ownerPhone || ownerPhone.length !== 10) {
+        return res.status(400).json({
+          success: false,
+          message: "Owner phone number is invalid",
+        });
+      }
+
+      if (!callerClean || callerClean.length !== 10) {
+        return res.status(400).json({
+          success: false,
+          message: "Caller phone number is invalid",
+        });
+      }
+
+      const agentNumber = `+91${ownerPhone}`;      // tag owner
+      const customerNumber = `+91${callerClean}`;  // scanner / caller
+
+      const twilioCall = await twilio.bridgeCall(
+        agentNumber,
+        customerNumber,
+        tagId
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Call initiated successfully",
+        data: {
+          sid: twilioCall.sid,
+          ownerPhone: agentNumber,
+          callerPhone: customerNumber,
+        },
+      });
     } catch (err) {
-      return res.status(500).json({ success: false, message: err?.message || "Server error" });
+      console.error("QrTagService.call error:", err);
+
+      return res.status(500).json({
+        success: false,
+        message: err?.message || "Server error",
+      });
     }
   }
 
